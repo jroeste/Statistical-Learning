@@ -14,7 +14,7 @@ tent as well as the output of any embedded R code chunks within the document. Yo
 ```{r cars}
 summary(cars)
 ```
-
+## new title
 ## Including Plots
 
 You can also embed plots, for example:
