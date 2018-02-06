@@ -13,4 +13,12 @@ i) Linear is ok, sett inn utregning + plot.
 $$
 \text{Pr}(Y_i = 1| {\bf X}={\bf x}_i) = p_i = \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}
 $$
+#b) K-nearest neighbor classifier 
 
+#c) LDA (& QDA)
+
+* $\pi_k$ is , 
+
+$$\text{Pr}(Y=k | {\bf X}={\bf x}) = \frac{\pi_k f_k({\bf x})}{\sum_{l=1}^K \pi_l f_l({\bf x})},$$
+
+$$f_k({\bf x}) = \frac{1}{(2 \pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2}}e^{-\frac{1}{2}({\bf x}-\boldsymbol{\mu_k})^T \boldsymbol{\Sigma}^{-1}({\bf x}-\boldsymbol{\mu_k})}.$$
