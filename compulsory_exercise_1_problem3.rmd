@@ -1,0 +1,16 @@
+---
+title: "compulsory_exercise_1_problem3.rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## ## Oppgave 3, classification
+#a)
+i) Linear is ok, sett inn utregning + plot.
+$$
+\text{Pr}(Y_i = 1| {\bf X}={\bf x}_i) = p_i = \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}
+$$
+

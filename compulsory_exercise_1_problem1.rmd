@@ -1,0 +1,11 @@
+---
+title: "Compulsory exercise 1, problem 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## a) - Training and test MSE
+The $M=1000$ repetitions has a big spread in the range for both $k=1$ and $k=2$, and decreases when $k$ increases. The variance in error $\epsilon $ is constant over the domain, as expected from the sample drawn from the Normal distribution. ( ? Should we include this?) With $k=10$, in the domain from $x=-2.4$ to $x=2.4$, the spread is about halved. In the endpoints, the regression lines becomes horisontal, which does not correspond to the real $f(x)=1+x^2+x^3$. When $K=25$, this trend continues, where the domain with horisontal lines is between $[-3,-1.8]$ and $[1.8,3]$.  The regression lines from $[-1.8,1.8]$ are wrong. This is because with that many points, the model is much less flexible and shows trends that are wrong. For a low $K$, the model has the most flexible fit. 
