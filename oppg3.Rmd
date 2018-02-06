@@ -1,5 +1,7 @@
 ---
-title: "Statistical Learning project 1"
+title: "Prosjekt 1 oppg 3"
+author: "Ida Marie Falnes"
+date: "5 februar 2018"
 output: html_document
 ---
 
@@ -7,19 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Oppgave 3, classification
+#a)
+i) Lineær ok, sett inn utregning + plot.
 
-
-=======
-Heihei
-
-tent as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
->>>>>>> 00a6fd3eee91624ffaf6c0ae8dc7c4923ffe5b58
 
 ```{r cars}
 summary(cars)
 ```
-## new title
+
 ## Including Plots
 
 You can also embed plots, for example:
