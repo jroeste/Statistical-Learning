@@ -3,6 +3,7 @@ library(GGally)
 library(class)
 library(MASS)
 library(pROC)
+
 wine=read.csv("https://www.math.ntnu.no/emner/TMA4268/2018v/data/Comp1Wine.csv",sep=" ")
 wine$class=as.factor(wine$class-1)
 colnames(wine)=c("y","x1","x2")
@@ -20,22 +21,24 @@ head(train)
 #fit a model on the training data
 glm.fits<-glm(y~x1+x2, family = binomial,data=train)
 summary(glm.fits)
-?glm()
-
+coef(glm.fits)
 b0=glm.fits$coefficients[1]
 b1=glm.fits$coefficients[2]
-b1
 b2=glm.fits$coefficients[3]
 
 #plotting training data
-plot(train$y)
+#plot(train$y)
 #a=(log(0.5)-b0)/b2
 b=-b1/b2
 a=(-b0)/b2
 
-p<-ggplot(train,mapping=aes(x=x1,y=x2,color=y))+ggtitle('Training observations')+geom_point() +geom_abline(slope=b, intercept=a)
+p<-ggplot(train,mapping=aes(x=x1,y=x2,color=y))+ggtitle('Training observations')+geom_point() +
+geom_abline(slope=b, intercept=a)
 p
-
+plott=stat_function(fun=function(x) exp(b0+x*b1+x*b2)/(1+exp(b0+x*b1 +x*b2)), geom="line", colour="red",linetype="dashed")
+ggplot(data.frame(x=c(-6,5)), aes(x))+
+  xlab(expression(x))+ 
+  ylab(expression(mu))+ plott
 #use model to predict testdata
 coef(glm.fits)
 
