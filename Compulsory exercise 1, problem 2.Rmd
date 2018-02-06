@@ -1,0 +1,55 @@
+---
+title: "Compulsory exercise 1, problem 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## a)
+
+Equation for fitted model:
+
+$$Y = -1.103 \cdot 10^{-1} - 2.989 \cdot 10^{-4}x_{SEX} + 2.378 \cdot 10^{-4}x_{AGE} - 2.504 \cdot 10^{-4}x_{CURSMOKE} + 3.087 \cdot 10^{-4}x_{BMI} + 9.288 \cdot 10^{-6}x_{TOTCHOL} + 5.469 \cdot 10^{-3}x_{BPMEDS}$$
+
+Explanation of the summary-output:
+
+`Estimate`: Gives the numerical values of the coefficients in the equation of the linear regression of the data. Each vaue corresponds to the variable on the same line. The first value corresponds to the intercept. Grapically this is the point where the linear regression line intercepts the y-axis. Practically this gives the output value when all input variables are zero. 
+
+`Std.Error`: Gives how pricese the estimated coefficients are.
+
+Formulas:
+
+$$\text{SE}(\hat{\beta}_{intercept}) = \sqrt{\sigma_{\varepsilon}^2 \Big [ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n (x_i -\bar{x})^2} \Big]}$$
+
+$$\text{SE}(\hat{\beta}_{variable}) = \sqrt{\frac{\sigma_{\varepsilon}^2}{\sum_{i=1}^n (x_i-\bar{x})^2}}$$
+
+`t value`: Number of standard deviations that the estimator is away from zero
+
+Formula:
+
+$$t = \frac{\beta - 0}{SE(\beta)}$$
+`Pr(>|t|)`: Measure of p-value. Probability of observing data resulting in the this or larger absolute $\beta$-value, given that there is no actual correlation between the parameter and Y. 
+
+`Residual standard error`:
+
+Estimate of $\sigma$. 
+
+$$RSE = \sqrt{RSS/(n-2)}$$
+
+`F-statistic`:
+
+Formula:
+
+$$F = \frac{(TSS-RSS)/p}{RSS/(n-p-1)}$$
+
+The value of the F-statistic is a result of performing the hypothesis test with null hypothesis:
+
+$$H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$$
+If the null hypothesis is correct, the F-statistic has expected value 1. If at least one of the parameters has real value above zero, the expected value of F is greater than 1. The F-statistic can thus be used to compare models. A model with higher F-statistic catches the correlations in the population better. 
+
+##b)
+
+The proportion of variability explained by this model is 0.2494, given by $R^2$. This means that about one forth of the variability in the -1/SYSBP data is explained by sex, age, current smoking, BMI, total cholesterol and anti-hypersensitive medication. Thus, about three forths of the veriability comes from other things that we haven't measured.
+
