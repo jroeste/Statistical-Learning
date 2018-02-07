@@ -94,7 +94,20 @@ $$
 
 #c) LDA (& QDA)
 
-* $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2.$f_k({\bf x})$ is the probability density function, given a class. 
+* $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2.$\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\Sigma$ is the covariate matrix, where the diagonal consists of the standard deviation elements, which are equal for all classes.
+
+* We can estimate the prior probability $\pi_k$ for the wines by taking the fraction of obervations from class $k$: $\pi_k=\frac{n_k}{n}$, where $n$ is the total number of observations.
+
+```{r, echo=FALSE}
+library(plyr)
+freq_train=count(train,"y") 
+pi=c(freq_train[1,2]/n,freq_train[2,2]/n)
+mu_0=c(mean(train[train$y==0,"x1"]),mean(train[train$y==0,"x2"]))
+mu_1=c(mean(train[train$y==1,"x1"]),mean(train[train$y==1,"x2"]))
+
+
+
+```
 
 $$\text{Pr}(Y=k | {\bf X}={\bf x}) = \frac{\pi_k f_k({\bf x})}{\sum_{l=1}^K \pi_l f_l({\bf x})},$$
 
