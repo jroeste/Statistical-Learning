@@ -15,28 +15,27 @@ $$Y = -1.103 \cdot 10^{-1} - 2.989 \cdot 10^{-4}x_{SEX} + 2.378 \cdot 10^{-4}x_{
 
 Explanation of the summary-output:
 
-`Estimate`: Gives the numerical values of the coefficients in the equation of the linear regression of the data. Each vaue corresponds to the variable on the same line. The first value corresponds to the intercept. Grapically this is the point where the linear regression line intercepts the y-axis. Practically this gives the output value when all input variables are zero. 
+`Estimate`: Gives the estimated numerical values of the coefficients in the equation of the linear regression of the data. The first value corresponds to the estimate of the intercept. Grapically this is the point where the linear regression line intercepts the y-axis. Practically this gives the output value when all input variables are zero. 
 
-`Std.Error`: Gives how pricese the estimated coefficients are.
-
-Formulas:
-
-$$\text{SE}(\hat{\beta}_{intercept}) = \sqrt{\sigma_{\varepsilon}^2 \Big [ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n (x_i -\bar{x})^2} \Big]}$$
-
-$$\text{SE}(\hat{\beta}_{variable}) = \sqrt{\frac{\sigma_{\varepsilon}^2}{\sum_{i=1}^n (x_i-\bar{x})^2}}$$
+`Std.Error`: Gives the square root of the estimated variance.
 
 `t value`: Number of standard deviations that the estimator is away from zero
 
 Formula:
 
 $$t = \frac{\beta - 0}{SE(\beta)}$$
-`Pr(>|t|)`: Measure of p-value. Probability of observing data resulting in the this or larger absolute $\beta$-value, given that there is no actual correlation between the parameter and Y. 
+`Pr(>|t|)`: Measure of p-value for the hypothesis with the following null hypothesis:
+
+$$H_0: \beta_i = 0 \textrm{, there is no actual relationship between the parameter and the response}$$
+
+The number Pr(>|t|) represents the probability of observing data resulting in an estimated $\beta$-value with absolute value equal to or larger than the one estimated for this data set, given that the null hypothesis is true. 
 
 `Residual standard error`:
 
-Estimate of $\sigma$. 
+Estimate of the standard deviation of the error $\epsilon$. It is computed as
 
-$$RSE = \sqrt{RSS/(n-2)}$$
+$$RSE = \sqrt{RSS/(n-p-2)}$$
+where n is the number of observations, p is the number of distinct predictors and $RSS=\sum_{n}^{i=1}(y_i - \hat y_i)^2$
 
 `F-statistic`:
 
@@ -91,7 +90,7 @@ The Anderson-Darling normality test for this model gives a p-value of 0.8959.
 
 Now we want to compare this model to a similar linear regression model with respones variable SYSBP rather than -1/SYSBP. An advantage of using SYSBP directly as response, is that the regression model will be somewhat easier to interpret.
 
-The followig is a summary of this model, a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test. 
+The followig is a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test for this model. 
 
 
 
@@ -100,7 +99,6 @@ The followig is a summary of this model, a "fitted values vs residuals"-plot, a 
 library(ggplot2)
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
 modelB=lm(SYSBP ~ .,data = data)
-summary(modelB)
 
 # residuls vs fitted
 ggplot(modelB, aes(.fitted, .resid)) + geom_point(pch = 21) + 
@@ -125,5 +123,3 @@ The "fitted values vs residuals"-plot for this is quite similar to that of the p
 In the Q-Q-plot here more of the points deviate from the straight line. Also, the p-value of the normality test is lower than in the previous model. Hence, the residuals in this model is less likely to come from a normal distribution, indicating that linear regression is not as suitable with SYSBP as response. 
 
 Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
-
-Hei
