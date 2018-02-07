@@ -3,8 +3,8 @@ title: "compulsory_exercise_1_problem3.rmd"
 output: html_document
 ---
 
-```{r setup, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, echo=FALSE}
+
 
 library(ggplot2)
 library(GGally)
