@@ -1,16 +1,16 @@
 ---
-title: "Compulsory exercise 1, problem 3"
+title: "compulsory_exercise_1_problem3.rmd"
 output: html_document
 ---
 
-## Problem 3a: Logistic Regression
-
+## ## Problem 3: Classification
+#a)
 * By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear. 
 
 $$
 \text{logit}(p_i)=\log ( \frac{p_i}{1-p_i})=\log(p_i)-\log(1-p_i)=\log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})-\log(1-\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})= \log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} ) - \log(\frac{1+e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}-e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})=\\=\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-[\log(1)-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})]=\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})=\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}
 $$
-* A logistic regression model was fitted usin the glm-function in R. In our case, the following values was found for the regression coefficients: 
+*A logistic regression model was fitted usin the glm-function in R. In our case, the following values was found for the regression coefficients: 
 
 $$
 
@@ -21,33 +21,61 @@ $$
 
 Output:
 
-``` {r, echo=FALSE}
-library(ggplot2)
-library(GGally)
-library(class)
-library(MASS)
-library(pROC)
-
-wine=read.csv("https://www.math.ntnu.no/emner/TMA4268/2018v/data/Comp1Wine.csv",sep=" ")
-wine$class=as.factor(wine$class-1)
-colnames(wine)=c("y","x1","x2")
-
-
-n=dim(wine)[1]
-set.seed(1900) #to get the same order if you rerun - but you change this to your favorite number
-ord = sample(1:n) #shuffle 
-test = wine[ord[1:(n/2)],]
-train = wine[ord[((n/2)+1):n],]
-glm.fits=glm(y~x1+x2, family = binomial,data=train)
-summary(glm.fits)
 
 ```
-* Interpretation of $\hat\beta_1$ and $\hat\beta_2$: 
-In the logistic regression setting, it can be more useful to consider the odds, $p_i/1-p_i$, rather than the probability $p_i$ as $p_i$ is an exponential function. In our case, the odds is the conditional probability that a wine is in class 1 divided by the probability that it is in class 0, given its specific values for the two covariates. 
+## Warning: package 'GGally' was built under R version 3.4.3
+```
+
+```
+## Warning: package 'pROC' was built under R version 3.4.3
+```
+
+```
+## Type 'citation("pROC")' for a citation.
+```
+
+```
+## 
+## Attaching package: 'pROC'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     cov, smooth, var
+```
+
+```
+## 
+## Call:
+## glm(formula = y ~ x1 + x2, family = binomial, data = train)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.09452  -0.24527   0.05351   0.28132   2.63601  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   0.4909     2.8718   0.171 0.864265    
+## x1            0.4109     0.1654   2.485 0.012968 *  
+## x2           -1.8848     0.5129  -3.675 0.000238 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 89.971  on 64  degrees of freedom
+## Residual deviance: 32.889  on 62  degrees of freedom
+## AIC: 38.889
+## 
+## Number of Fisher Scoring iterations: 7
+```
+* interpretation of $\hat\beta_1$ and $\hat\beta_2$: 
+In the logistic regression setting, it can be more useful to consider the odds, $p_i/1-p_i$, rather than the probability $p_i$ as p_i is an exponential function. In our case, the odds is the conditional probability that a wine is in class 1 divided by the probability that it is in class 0, given its specific values for the two covariates. 
 
 As shown above, logit($p_i$) is a linear function in the two covariates $x_{i1}$ and $x_{i2}$. If we keep one of the covariates constant, say $x_{i2}$ and increase $x_i1$ by 1 unit, logit($p_i$) will increase linearly with $\beta_1$. This means the odds itself will be multiplied with $exp(\beta_1)$. In other words, if for now only considering the alkalinity of ash in wine, a higher value for the covariate measuring this will give a higher odds for the wine being in class 1. Similarly, since $\beta_2$ is negative, an increase in the color intensity of a wine will give a decrease in the odds of the wine being in class 1. 
 
-* [??] By using the rule $\text{Pr}(Y_i = 1|{\bf x}) = p_i > 0.5$ for classifying an observation to class 1, the following rule was found:
+*[??] By using the rule $\text{Pr}(Y_i = 1|{\bf x}) = p_i > 0.5$ for classifying an observation to class 1, the following rule was found:
 
 $$
 0.5> \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} \\
@@ -58,20 +86,7 @@ x_{i2}<-\beta_0-\beta_1x_1
 $$
 
 * Figure\ref??? shows the plot of the training data, in addition to the boundary line found above.
-```{r, echo=FALSE}
-b0=glm.fits$coefficients[1]
-b1=glm.fits$coefficients[2]
-b2=glm.fits$coefficients[3]
-#plotting training data
-#plot(train$y)
-#a=(log(0.5)-b0)/b2
-b=-b1/b2
-a=(-b0)/b2
-
-p<-ggplot(train,mapping=aes(x=x1,y=x2,color=y))+ggtitle('Training observations')+geom_point() + geom_abline(slope=b, intercept=a)
-
-p
-```
+<img src="compulsory_exercise_1_problem3_files/figure-html/unnamed-chunk-2-1.png" width="672" />
 i) Linear is ok, sett inn utregning + plot.
 
 i) Lineær ok, sett inn utregning + plot.

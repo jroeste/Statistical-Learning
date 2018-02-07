@@ -127,3 +127,13 @@ In the Q-Q-plot here more of the points deviate from the straight line. Also, th
 Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
 
 Hei
+
+
+##c)
+In this task, `modelA` is used to analyse the connection between $BMI$ and the response. 
+
+* The estimated numerical value of $\hat\beta_{BMI}$ is found from the output of the provided code: $\hat\beta_{BMI}\approx 3.087e-04$.
+
+* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the response. Considering the rather low value of $\hat\beta_{BMI}$, it seems like for `modelA`, the $BMI$ covariate has a low impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, one will most likely not observe any changes in the response.
+
+* 99% confidence interval for  $\beta$. 
