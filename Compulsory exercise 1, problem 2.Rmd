@@ -51,5 +51,79 @@ If the null hypothesis is correct, the F-statistic has expected value 1. If at l
 
 ##b)
 
-The proportion of variability explained by this model is 0.2494, given by $R^2$. This means that about one forth of the variability in the -1/SYSBP data is explained by sex, age, current smoking, BMI, total cholesterol and anti-hypersensitive medication. Thus, about three forths of the veriability comes from other things that we haven't measured.
+The proportion of variability explained by this model is 0.2494, given by the $R^2$-value. This means that about one forth of the variability in the -1/SYSBP data is explained by sex, age, current smoking, BMI, total cholesterol and anti-hypersensitive medication. Thus, about three forths of the veriability comes from other things that we haven't measured.
 
+The figure below shows a plot of the residuals vs the fitted values. 
+```{r echo = FALSE}
+library(ggplot2)
+data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
+modelA=lm(-1/sqrt(SYSBP) ~ .,data = data)
+
+
+# residuls vs fitted
+ggplot(modelA, aes(.fitted, .resid)) + geom_point(pch = 21) + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  geom_smooth(se = FALSE, col = "red", size = 0.5, method = "loess") + 
+  labs(x = "Fitted values", y = "Residuals", title = "Fitted values vs. residuals", subtitle = deparse(modelA$call))
+
+```
+
+The figure shows that most of the residuals lie between 0.015 and -0.015. The red line represents the average residual value at each fitted value. This shows that the residuals are mostly sentered around zero. Ideally the residuals should be symetrically distributed, and not show any patterns with the size of the fitted values. For large fitted values the average seems to decrease. However this could be due to randomness since there are few measured values of that size. Thus, it seems like the residuals are relatively independent of the fitted values. 
+
+The next figure is a Q-Q-plot of the standarized residuals.
+
+```{r echo=FALSE}
+
+# qq-plot of residuals
+ggplot(modelA, aes(sample = .stdresid)) +
+  stat_qq(pch = 19) + 
+  geom_abline(intercept = 0, slope = 1, linetype = "dotted") +
+  labs(x = "Theoretical quantiles", y = "Standardized residuals", title = "Normal Q-Q", subtitle = deparse(modelA$call))
+
+
+```
+
+Here the residuals follows a straight line. This means that the residuals are normally distributed. 
+
+Over all it seems like the linear regression model works well for the data. However, due to a relatively low $R^2$-value, there are probably many unknown factors influencing the blood pressure. 
+
+The Anderson-Darling normality test for this model gives a p-value of 0.8959. 
+
+Now we want to compare this model to a similar linear regression model with respones variable SYSBP rather than -1/SYSBP. An advantage of using SYSBP directly as response, is that the regression model will be somewhat easier to interpret.
+
+The followig is a summary of this model, a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test. 
+
+
+
+```{r echo=FALSE}
+
+library(ggplot2)
+data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
+modelB=lm(SYSBP ~ .,data = data)
+summary(modelB)
+
+# residuls vs fitted
+ggplot(modelB, aes(.fitted, .resid)) + geom_point(pch = 21) + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  geom_smooth(se = FALSE, col = "red", size = 0.5, method = "loess") + 
+  labs(x = "Fitted values", y = "Residuals", title = "Fitted values vs. residuals", subtitle = deparse(modelB$call))
+
+# qq-plot of residuals
+ggplot(modelB, aes(sample = .stdresid)) +
+  stat_qq(pch = 19) + 
+  geom_abline(intercept = 0, slope = 1, linetype = "dotted") +
+  labs(x = "Theoretical quantiles", y = "Standardized residuals", title = "Normal Q-Q", subtitle = deparse(modelB$call))
+
+# normality test
+library(nortest) 
+ad.test(rstudent(modelB))
+
+```
+
+The "fitted values vs residuals"-plot for this is quite similar to that of the previous model. 
+
+In the Q-Q-plot here more of the points deviate from the straight line. Also, the p-value of the normality test is lower than in the previous model. Hence, the residuals in this model is less likely to come from a normal distribution, indicating that linear regression is not as suitable with SYSBP as response. 
+
+Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
+
+Hei
