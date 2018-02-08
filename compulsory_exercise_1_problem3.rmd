@@ -101,11 +101,35 @@ $$
 ```{r, echo=FALSE}
 library(plyr)
 freq_train=count(train,"y") 
-pi=c(freq_train[1,2]/n,freq_train[2,2]/n)
-mu_0=c(mean(train[train$y==0,"x1"]),mean(train[train$y==0,"x2"]))
-mu_1=c(mean(train[train$y==1,"x1"]),mean(train[train$y==1,"x2"]))
+n0=freq_train[1,2]
+n1=freq_train[2,2]
+pi=c(n0/n,n1/n)
+x_01=train[train$y==0,"x1"]
+x_02=train[train$y==0,"x2"]
+x_11=train[train$y==1,"x1"]
+x_12=train[train$y==1,"x2"]
+mu_0=c(mean(x_01),mean(x_02))
+mu_1=c(mean(x_11),mean(x_12))
+sigma_0=matrix(0,2,2)
+sigma_1=matrix(0,2,2)
+Sigma_train=matrix(0,2,2)
+x_vec=c(0,0)
+for (i in (1:n0)){
+  
+  x_vec=c(x_01[i],x_02[i])
+  sigma_0=sigma_0+(x_vec-mu_0)%*%t(x_vec-mu_0)
+  
+}
+sigma_0=sigma_0*1/(n0-1)
 
+for (i in (1:n1)){
+  
+  x_vec=c(x_11[i],x_12[i])
+  sigma_1=sigma_1+(x_vec-mu_1)%*%t(x_vec-mu_1)
+}
+sigma_1=sigma_1*1/(n1-1)
 
+Sigma=(n0-1)*sigma_0/(n0+n1-2)+(n1-1)*sigma_1/(n0+n1-2)
 
 ```
 
