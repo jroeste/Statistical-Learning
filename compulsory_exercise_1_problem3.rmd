@@ -134,8 +134,11 @@ $$
 P(Y=1|X=x_0) = \frac{1}{K}\sum_{i\in \mathcal{N_0}}I(y_i=1).
 $$
 
-gives the probability that a test observation with predictor values $x_0$ has response value $Y=1$. This probability
+gives the probability that a test observation with predictor values $x_0$ has response value $Y=1$. This probability is given as the proportion of the K nearest points in the training data that are in class 1. The equation includes an indicator function $I(y_i = 1)$, which equals 1 if $y_i = 1$ and 0 if $y_i \neq 1$. In this way it sums up the number of neighboors that are in class 1. 
 
+K-nearest neighboor is used to classify the wines in the test set. The confusion table, sensitivity and specificity for KNN with $K=3$ are given below:
+
+Confusion table:
 ```{r, echo=FALSE}
 
 library(class)
@@ -146,17 +149,43 @@ knn1.wine = knn(train = knn.train[,-1], test = knn.test[,-1], cl = train$y, k=3)
 tknn3 = table(knn1.wine, test$y)
 tknn3
 
+```
+Sensitivity:
+```{r, echo=FALSE}
+
 sens_3 = tknn3[2,2]/(tknn3[1,2]+tknn3[2,2])
 sens_3
+
+```
+
+Specificity:
+```{r, echo=FALSE}
 spec_3 = tknn3[1,1]/(tknn3[1,1]+tknn3[2,1])
 spec_3
+
+```
+These results show that the classifier is not able to classify all test observations correctly. However, considering the overlap of the two classes in the plot, there is some irreducible error present. Thus, the classifier might do well. 
+
+
+With $K=9$ we got the following results:
+
+Confusion table:
+```{r, echo=FALSE}
 
 knn1.wine = knn(train = knn.train[,-1], test = knn.test[,-1], cl = train$y, k=9)
 tknn9 = table(knn1.wine, test$y)
 tknn9
+```
 
+Sensitivity:
+```{r, echo=FASLE}
 sens_9 = tknn9[2,2]/(tknn9[1,2]+tknn9[2,2])
 sens_9
+
+```
+
+Specificity:
+```{r, echo=FALSE}
 spec_9 = tknn9[1,1]/(tknn9[1,1]+tknn9[2,1])
 spec_9
 

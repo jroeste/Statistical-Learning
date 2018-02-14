@@ -8,4 +8,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## a) - Training and test MSE
-The $M=1000$ repetitions has a big spread in the range for both $k=1$ and $k=2$, and decreases when $k$ increases. The variance in error $\epsilon $ is constant over the domain, as expected from the sample drawn from the Normal distribution. ( ? Should we include this?) With $k=10$, in the domain from $x=-2.4$ to $x=2.4$, the spread is about halved. In the endpoints, the regression lines becomes horisontal, which does not correspond to the real $f(x)=1+x^2+x^3$. When $K=25$, this trend continues, where the domain with horisontal lines is between $[-3,-1.8]$ and $[1.8,3]$.  The regression lines from $[-1.8,1.8]$ are wrong. This is because with that many points, the model is much less flexible and shows trends that are wrong. For a low $K$, the model has the most flexible fit.
+The $M=1000$ repetitions has a big spread in the range for both $k=1$ and $k=2$, and decreases when $k$ increases. The variance in error $\epsilon$ is constant over the domain, as expected from the sample drawn from the Normal distribution. ( ? Should we include this?) With $k=10$, in the domain from $x=-2.4$ to $x=2.4$, the spread is about halved. In the endpoints, the regression lines becomes horisontal, which does not correspond to the real $f(x)=1+x^2+x^3$. When $K=25$, this trend continues, where the domain with horisontal lines is between $[-3,-1.8]$ and $[1.8,3]$.  The regression lines from $[-1.8,1.8]$ are wrong. This is because with that many points, the model is much less flexible and shows trends that are wrong. For a low $K$, the model has the most flexible fit.
+
+## b)
+
+The variance for a given x-value is calculated from the spread of the predicted values from the M regression models. The bias is calculated from the drifference of the mean of the predicted values and the true response value. 
+
+When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
+
+The goal is to reduce the total error, which is
+
+
+$$\text{E}[(Y - \hat{f}(x_0))^2]=\text{Var}(\varepsilon) +  \text{Var}[\hat{f}(x_0)]+[\text{Bias}(\hat{f}(x_0))]^2$$
+
+In the figure the total error has minimum point around 3-5, which is in agreement with what we found in exercise a). 
+
+
+
