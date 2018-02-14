@@ -131,26 +131,26 @@ Hei
 ##c)
 In this task, `modelA` is used to analyse the connection between $BMI$ and the response. 
 
-* The estimated numerical value of $\hat\beta_{BMI}$ is found from the output of the provided code: $\hat\beta_{BMI}\approx 3.087e-04$.
+* The estimated numerical value of $\hat\beta_{BMI}$ is found from the output of the provided code: $\hat\beta_{BMI}\approx 3.087 \cdot 10^{-4}$.
 
-* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response, or the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Considering $\hat\beta_{BMI}$ and comparing it to the other estimated coefficient, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087e-04$.
+* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087\cdot10^{-4}$.
 
-* 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99%$ confident to find $\beta_{BMI}$. It can be found using the standard error from the fitted model, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955e-05$. The confidence interval is given by
+* 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99%$ confident to find $\beta_{BMI}$. It can be found using the standard error from the fitted model, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955 \cdot 10^{-5}$. The confidence interval is given by
 
 $$
 \hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI})
 $$
-where the t-distribuition can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.05$, so 
+where the t-distribuition can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.01$, so 
 $$
 \hat\beta_{BMI}\pm z_{\alpha/2}\cdot SE(\hat\beta_{BMI}),
 $$
-where $z_{\alpha/2}=z_{\0.01/2}=2.576$, so the confidence interval is
+where $z_{\alpha/2}=z_{0.01/2}=2.576$, so the confidence interval is
 
 $$
 [3.087 \cdot 10^{-4} - 2.576 \cdot (2.955 \cdot 10^{-5}), 3.087 \cdot 10^{-4} + 2.576 \cdot (2.955 \cdot 10^{-5})]= \\ 
 [2.326 \cdot 10^{-4}, 3.848 \cdot10^{-4}].
 $$
-This can also be confirmed by the built-in function 'confint()' in R:
+This can also be confirmed by the built-in function `confint()` in R:
 
 ```{r echo=FALSE}
 int=confint(modelA,level = 0.99)
@@ -158,36 +158,31 @@ int[5,]
 
 ```
 
-When interpreting the confidence interval, it can be useful to consider the accuracy of our estimation, for example the standard error of the parameter. In this case, $SE(\hat\beta_{BMI})=(2.955 \cdot 10^{-5})$. This is a factor $10$ smaller than the estimated parameter itself. With this in mind, it is quite safe to assume that $\beta_{BMI}$ is far enough from zero to conclude that according to 'modelA', there is in fact a connection between the BMI and the response. 
+When interpreting the confidence interval, it can be useful to consider the accuracy of our estimation, for example the standard error of the parameter. In this case, $SE(\hat\beta_{BMI})=(2.955 \cdot 10^{-5})$. This is a factor $10$ smaller than the estimated parameter itself. With this in mind, it is quite safe to assume that $\beta_{BMI}$ is far enough from zero to conclude that according to `modelA`, there is in fact a connection between the BMI and the response. 
 
-[dette ble jo helt latterlig feil]
-Therefore, on average we are quite confident that if one ignores all the other covariates, an increase of one $BMI$-unit, there will be an average decrease in the systolic blood pressure of between $-4299.2^2$ and $-2598.8^2$ units.
-
-* Can we know anything about the p-value for a hypothesis test? In words, the null hypothesis $H_0: \beta_{BMI}=0$ is saying that "there is no relationship between \beta_{BMI}" and $-1/sqrt(SYSBP)$.
- - We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01.
+* Can we know anything about the p-value for a hypothesis test? In words, the null hypothesis $H_0: \beta_{BMI}=0$ is saying that "there is no relationship between $\beta_{BMI}$ and $-1/sqrt(SYSBP)$".
+ - We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero, i.e. we are 99 % confident that there in fact is a relationship. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI}$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01.
  
- ##d)
+#d)
  
+Now, we are considering a new observation, namely 
 ```{r, echo=FALSE}
 
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
+
 modelA=lm(-1/sqrt(SYSBP) ~ .,data = data)
 new=data.frame(SEX=1,AGE=56,CURSMOKE=1,BMI=89/1.75^2,TOTCHOL=200,BPMEDS=0)
 new=cbind(1,new)
+new
+```
+
+* Using `modelA`, one obtain the value $0.0867$ for his $1/sqrt(SYSBP)$ and $133$ for his $SYSBP$. The code output is shown below.
+
+```{r, echo=FALSE}
 Y=coef(modelA)%*%t(new)
 Y
 bp=(1/(-Y)^2)
 bp
-
-
 ```
 
-* Using $modelA$, one obtain the value $0.0867$ for his $1/sqrt(SYSBP)$ and $133$ for his $SYSBP$.
-
 * Construct a 90% prediction interval:
-
-
-
-
-heihei
-
