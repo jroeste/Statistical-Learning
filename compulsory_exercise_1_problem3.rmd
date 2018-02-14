@@ -1,14 +1,10 @@
----
-<<<<<<< HEAD
-title: "Compulsory exercise 1, problem 3"
-output: html_document
-=======
+
 title: "compulsory_exercise_1_problem3.rmd"
 output:
 <<<<<<< HEAD
   pdf_document: default
   html_document: default
->>>>>>> 683d8cf3975dd5fcb894a6865aa637bdf29416bf
+>>>>>>>
 ---
 
 ## Problem 3a: Logistic Regression
@@ -30,23 +26,13 @@ $$
 Output:
 
 ``` {r, echo=FALSE}
-=======
-  html_document:
-    df_print: paged
-  output: null
-  pdf_document: null
-editor_options:
-  chunk_output_type: console
----
-
-```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warnings=FALSE)
 knitr::opts_chunk$set(message =FALSE)
 ```
 
 ```{r, echo=FALSE}
->>>>>>> 332fc9404998211e691dc0694c7a57390cc3b665
+
 library(ggplot2)
 library(GGally)
 library(class)
@@ -66,7 +52,6 @@ set.seed(4268) #to get the same order if you rerun - but you change this to your
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
-<<<<<<< HEAD
 glm.fits=glm(y~x1+x2, family = binomial,data=train)
 summary(glm.fits)
 
