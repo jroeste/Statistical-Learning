@@ -104,6 +104,32 @@ vii) Hvordan presentere alle sannsynlighetene?
 viii)$$\text{Pr}(Y_i = 1| {\bf X}={\bf x}_i) = p_i = \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}$$
 #b) K-nearest neighbor classifier 
 
+```{r, echo=FALSE}
+
+library(class)
+knn.train = train
+knn.test = test
+
+knn1.wine = knn(train = knn.train[,-1], test = knn.test[,-1], cl = train$y, k=3)
+tknn3 = table(knn1.wine, test$y)
+tknn3
+
+sens_3 = tknn3[2,2]/(tknn3[1,2]+tknn3[2,2])
+sens_3
+spec_3 = tknn3[1,1]/(tknn3[1,1]+tknn3[2,1])
+spec_3
+
+knn1.wine = knn(train = knn.train[,-1], test = knn.test[,-1], cl = train$y, k=9)
+tknn9 = table(knn1.wine, test$y)
+tknn9
+
+sens_9 = tknn9[2,2]/(tknn9[1,2]+tknn9[2,2])
+sens_9
+spec_9 = tknn9[1,1]/(tknn9[1,1]+tknn9[2,1])
+spec_9
+
+```
+
 #c) LDA (& QDA)
 
 * $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2.$\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\Sigma$ is the covariate matrix.
