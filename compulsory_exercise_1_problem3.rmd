@@ -114,7 +114,7 @@ $$\hat{\boldsymbol{\mu}}_k = \frac{1}{n_k}\sum_{i:y_i=k} {\bf X}_i$$.
 The $\Sigma$-matrix can be estimated for the two classes by summing up $$\hat{\boldsymbol{\Sigma}}_k=\frac{1}{n_k-1}\sum_{i:y_i=k} ({\bf X}_i-\hat{\boldsymbol{\mu}}_k ) ({\bf X}_i-\hat{\boldsymbol{\mu}}_k)^T$$, with $$\hat{\boldsymbol{\Sigma}}=\frac{(n_0 - 1) \cdot \hat{\boldsymbol{\Sigma}}_0 + (n_1 - 1) \cdot \hat{\boldsymbol{\Sigma}}_1}{n_1 + n_2 - 2}$$. Computing the estimates for these quantities from the train set, we get:
 
 ```{r, echo=FALSE}
-library(plyr)
+library(dplyr)
 
 
 n0=sum(train[,1]==1)
@@ -252,5 +252,26 @@ print(test_error)
 * The sensitivity is 0.833, and the specificity is 0.828. This is quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 ```
 
+
+```{r, eval=FALSE}
+library(pROC)
+glmroc=roc(response=test$y,predictor=predglm)
+plot(glmroc)
+auc(glmroc)
+
+KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
+KNN3probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = TRUE))$prob
+KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
+KNN3roc=roc(response=test$y,predictor=KNN3prob) 
+
+plot(KNN3roc)
+auc(KNN3roc)
+ltrain=lda(y~x1+x2,data=train)
+lpred=predict(object = ltrain, newdata = test)$posterior[,1]
+lroc=roc(response=test$y,lpred)
+plot(lroc)
+auc(lroc)
+```
+```
 
 
