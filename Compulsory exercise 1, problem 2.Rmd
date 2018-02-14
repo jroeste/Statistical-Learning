@@ -15,28 +15,27 @@ $$Y = -1.103 \cdot 10^{-1} - 2.989 \cdot 10^{-4}x_{SEX} + 2.378 \cdot 10^{-4}x_{
 
 Explanation of the summary-output:
 
-`Estimate`: Gives the numerical values of the coefficients in the equation of the linear regression of the data. Each vaue corresponds to the variable on the same line. The first value corresponds to the intercept. Grapically this is the point where the linear regression line intercepts the y-axis. Practically this gives the output value when all input variables are zero. 
+`Estimate`: Gives the estimated numerical values of the coefficients in the equation of the linear regression of the data. The first value corresponds to the estimate of the intercept. Grapically this is the point where the linear regression line intercepts the y-axis. Practically this gives the output value when all input variables are zero. 
 
-`Std.Error`: Gives how pricese the estimated coefficients are.
-
-Formulas:
-
-$$\text{SE}(\hat{\beta}_{intercept}) = \sqrt{\sigma_{\varepsilon}^2 \Big [ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n (x_i -\bar{x})^2} \Big]}$$
-
-$$\text{SE}(\hat{\beta}_{variable}) = \sqrt{\frac{\sigma_{\varepsilon}^2}{\sum_{i=1}^n (x_i-\bar{x})^2}}$$
+`Std.Error`: Gives the square root of the estimated variance.
 
 `t value`: Number of standard deviations that the estimator is away from zero
 
 Formula:
 
 $$t = \frac{\beta - 0}{SE(\beta)}$$
-`Pr(>|t|)`: Measure of p-value. Probability of observing data resulting in the this or larger absolute $\beta$-value, given that there is no actual correlation between the parameter and Y. 
+`Pr(>|t|)`: Measure of p-value for the hypothesis with the following null hypothesis:
+
+$$H_0: \beta_i = 0 \textrm{, there is no actual relationship between the parameter and the response}$$
+
+The number Pr(>|t|) represents the probability of observing data resulting in an estimated $\beta$-value with absolute value equal to or larger than the one estimated for this data set, given that the null hypothesis is true. 
 
 `Residual standard error`:
 
-Estimate of $\sigma$. 
+Estimate of the standard deviation of the error $\epsilon$. It is computed as
 
-$$RSE = \sqrt{RSS/(n-2)}$$
+$$RSE = \sqrt{RSS/(n-p-2)}$$
+where n is the number of observations, p is the number of distinct predictors and $RSS=\sum_{n}^{i=1}(y_i - \hat y_i)^2$
 
 `F-statistic`:
 
@@ -91,7 +90,7 @@ The Anderson-Darling normality test for this model gives a p-value of 0.8959.
 
 Now we want to compare this model to a similar linear regression model with respones variable SYSBP rather than -1/SYSBP. An advantage of using SYSBP directly as response, is that the regression model will be somewhat easier to interpret.
 
-The followig is a summary of this model, a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test. 
+The followig is a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test for this model. 
 
 
 
@@ -100,7 +99,6 @@ The followig is a summary of this model, a "fitted values vs residuals"-plot, a 
 library(ggplot2)
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
 modelB=lm(SYSBP ~ .,data = data)
-summary(modelB)
 
 # residuls vs fitted
 ggplot(modelB, aes(.fitted, .resid)) + geom_point(pch = 21) + 
@@ -125,6 +123,7 @@ The "fitted values vs residuals"-plot for this is quite similar to that of the p
 In the Q-Q-plot here more of the points deviate from the straight line. Also, the p-value of the normality test is lower than in the previous model. Hence, the residuals in this model is less likely to come from a normal distribution, indicating that linear regression is not as suitable with SYSBP as response. 
 
 Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
+<<<<<<< HEAD
 
 Hei
 
@@ -134,6 +133,61 @@ In this task, `modelA` is used to analyse the connection between $BMI$ and the r
 
 * The estimated numerical value of $\hat\beta_{BMI}$ is found from the output of the provided code: $\hat\beta_{BMI}\approx 3.087e-04$.
 
-* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the response. Considering the rather low value of $\hat\beta_{BMI}$, it seems like for `modelA`, the $BMI$ covariate has a low impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, one will most likely not observe any changes in the response.
+* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response, or the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Considering $\hat\beta_{BMI}$ and comparing it to the other estimated coefficient, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087e-04$.
 
-* 99% confidence interval for  $\beta$. 
+* 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99%$ confident to find $\beta_{BMI}$. It can be found using the standard error from the fitted model, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955e-05$. The confidence interval is given by
+
+$$
+\hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI})
+$$
+where the t-distribuition can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.05$, so 
+$$
+\hat\beta_{BMI}\pm z_{\alpha/2}\cdot SE(\hat\beta_{BMI}),
+$$
+where $z_{\alpha/2}=z_{\0.01/2}=2.576$, so the confidence interval is
+
+$$
+[3.087 \cdot 10^{-4} - 2.576 \cdot (2.955 \cdot 10^{-5}), 3.087 \cdot 10^{-4} + 2.576 \cdot (2.955 \cdot 10^{-5})]= \\ 
+[2.326 \cdot 10^{-4}, 3.848 \cdot10^{-4}].
+$$
+This can also be confirmed by the built-in function 'confint()' in R:
+
+```{r echo=FALSE}
+int=confint(modelA,level = 0.99)
+int[5,]
+
+```
+
+When interpreting the confidence interval, it can be useful to consider the accuracy of our estimation, for example the standard error of the parameter. In this case, $SE(\hat\beta_{BMI})=(2.955 \cdot 10^{-5})$. This is a factor $10$ smaller than the estimated parameter itself. With this in mind, it is quite safe to assume that $\beta_{BMI}$ is far enough from zero to conclude that according to 'modelA', there is in fact a connection between the BMI and the response. 
+
+[dette ble jo helt latterlig feil]
+Therefore, on average we are quite confident that if one ignores all the other covariates, an increase of one $BMI$-unit, there will be an average decrease in the systolic blood pressure of between $-4299.2^2$ and $-2598.8^2$ units.
+
+* Can we know anything about the p-value for a hypothesis test? In words, the null hypothesis $H_0: \beta_{BMI}=0$ is saying that "there is no relationship between \beta_{BMI}" and $-1/sqrt(SYSBP)$.
+ - We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01.
+ 
+ ##d)
+ 
+```{r, echo=FALSE}
+
+data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
+modelA=lm(-1/sqrt(SYSBP) ~ .,data = data)
+new=data.frame(SEX=1,AGE=56,CURSMOKE=1,BMI=89/1.75^2,TOTCHOL=200,BPMEDS=0)
+new=cbind(1,new)
+Y=coef(modelA)%*%t(new)
+Y
+bp=(1/(-Y)^2)
+bp
+
+
+```
+
+* Using $modelA$, one obtain the value $0.0867$ for his $1/sqrt(SYSBP)$ and $133$ for his $SYSBP$.
+
+* Construct a 90% prediction interval:
+
+
+
+
+heihei
+

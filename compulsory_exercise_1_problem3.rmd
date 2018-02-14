@@ -1,6 +1,13 @@
 ---
+<<<<<<< HEAD
 title: "Compulsory exercise 1, problem 3"
 output: html_document
+=======
+title: "compulsory_exercise_1_problem3.rmd"
+output:
+  pdf_document: default
+  html_document: default
+>>>>>>> 683d8cf3975dd5fcb894a6865aa637bdf29416bf
 ---
 
 ## Problem 3a: Logistic Regression
@@ -34,30 +41,57 @@ colnames(wine)=c("y","x1","x2")
 
 
 n=dim(wine)[1]
-set.seed(1900) #to get the same order if you rerun - but you change this to your favorite number
+set.seed(4268) #to get the same order if you rerun - but you change this to your favorite number
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
+<<<<<<< HEAD
 glm.fits=glm(y~x1+x2, family = binomial,data=train)
 summary(glm.fits)
 
 ```
 * Interpretation of $\hat\beta_1$ and $\hat\beta_2$: 
 In the logistic regression setting, it can be more useful to consider the odds, $p_i/1-p_i$, rather than the probability $p_i$ as $p_i$ is an exponential function. In our case, the odds is the conditional probability that a wine is in class 1 divided by the probability that it is in class 0, given its specific values for the two covariates. 
+=======
+glm.fits<-glm(y~x1+x2, family = binomial,data=train)
+summary(glm.fits)
+#coef(glm.fits)
 
-As shown above, logit($p_i$) is a linear function in the two covariates $x_{i1}$ and $x_{i2}$. If we keep one of the covariates constant, say $x_{i2}$ and increase $x_i1$ by 1 unit, logit($p_i$) will increase linearly with $\beta_1$. This means the odds itself will be multiplied with $exp(\beta_1)$. In other words, if for now only considering the alkalinity of ash in wine, a higher value for the covariate measuring this will give a higher odds for the wine being in class 1. Similarly, since $\beta_2$ is negative, an increase in the color intensity of a wine will give a decrease in the odds of the wine being in class 1. 
+```
+
+
+## ## Oppgave 3, classification
+#a)
+* By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear. 
+
+$$
+\text{logit}(p_i)=\log ( \frac{p_i}{1-p_i})=\log(p_i)-\log(1-p_i)=\log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})-\log(1-\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})= \log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} ) - \log(\frac{1+e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}-e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})=\\=\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-[\log(1)-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})]=\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})=\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}
+$$
+*A logistic regression model was fitted using the glm-function in R. In our case, the following values was found for the regression coefficients: 
+
+-$\hat\beta_0\approx 0.4909$
+-$\hat\beta_1\approx 0.4109$
+-$\hat\beta\approx -1.8828$
+
+* interpretation of $\hat\beta_1$ and $\hat\beta_2$: 
+In the logistic regression setting, it can be more useful to consider the odds, $p_i/1-p_i$, rather than the probability $p_i$ as p_i is an exponential function. In our case, the odds is the conditional probability that a wine is in class 1 divided by the probability that it is in class 0, given its specific values for the two covariates. 
+>>>>>>> 683d8cf3975dd5fcb894a6865aa637bdf29416bf
+
+As shown above, logit($p_i$) is a linear function in the two covariates $x_{i1}$ and $x_{i2}$. If we keep one of the covariates constant, say $x_{i2}$ and increase $x_i1$ by 1 unit, logit($p_i$) will increase linearly with $\beta_1$. This means the odds itself will be multiplied with $exp(\beta_1)$. In other words, if for now only considering the alkalinity of ash in wine, a higher value for the covariate measuring this will give a higher odds for the wine being in class 1. Similarly, since $\beta_2$ is negative, an increase in the color intensity of a wine will give a decrease in the odds of the wine being in class 1, i.e. more likely to be in class 2. 
 
 * [??] By using the rule $\text{Pr}(Y_i = 1|{\bf x}) = p_i > 0.5$ for classifying an observation to class 1, the following rule was found:
 
-$$
-0.5> \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} \\
-0.5\cdot ({ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})>e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\
-0.5>0.5\cdot e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\ 
-\log(1)>\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} \\
-x_{i2}<-\beta_0-\beta_1x_1
-$$
+\begin{align}
 
-* Figure\ref??? shows the plot of the training data, in addition to the boundary line found above.
+0.5$> \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} \\
+0.5\cdot ({ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})>e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\
+0.5$>0.5\cdot e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\ 
+\log(1)$>\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} \\
+x_{i2}$<-\beta_0-\beta_1x_1
+
+\end{align}
+
+* Figure \ref(??) shows the plot of the training data, in addition to the boundary line found above.
 ```{r, echo=FALSE}
 b0=glm.fits$coefficients[1]
 b1=glm.fits$coefficients[2]
@@ -90,7 +124,20 @@ $$
 
 #c) LDA (& QDA)
 
-* $\pi_k$ is , 
+* $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2.$\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\Sigma$ is the covariate matrix, where the diagonal consists of the standard deviation elements, which are equal for all classes.
+
+* We can estimate the prior probability $\pi_k$ for the wines by taking the fraction of obervations from class $k$: $\pi_k=\frac{n_k}{n}$, where $n$ is the total number of observations.
+
+```{r, echo=FALSE}
+library(plyr)
+freq_train=count(train,"y") 
+pi=c(freq_train[1,2]/n,freq_train[2,2]/n)
+mu_0=c(mean(train[train$y==0,"x1"]),mean(train[train$y==0,"x2"]))
+mu_1=c(mean(train[train$y==1,"x1"]),mean(train[train$y==1,"x2"]))
+
+
+
+```
 
 $$\text{Pr}(Y=k | {\bf X}={\bf x}) = \frac{\pi_k f_k({\bf x})}{\sum_{l=1}^K \pi_l f_l({\bf x})},$$
 
