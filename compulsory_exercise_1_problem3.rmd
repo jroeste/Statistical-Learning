@@ -1,15 +1,9 @@
----
-<<<<<<< HEAD
-title: "Compulsory exercise 1, problem 3"
-output: html_document
-=======
-title: "compulsory_exercise_1_problem3.rmd"
-output:
-<<<<<<< HEAD
-  pdf_document: default
-  html_document: default
->>>>>>> 683d8cf3975dd5fcb894a6865aa637bdf29416bf
----
+#---
+#<<<<<<< HEAD
+#title: "Compulsory exercise 1, problem 3"
+#output: html_document
+
+#---
 
 ## Problem 3a: Logistic Regression
 
@@ -30,7 +24,7 @@ $$
 Output:
 
 ``` {r, echo=FALSE}
-=======
+#=======
   html_document:
     df_print: paged
   output: null
@@ -77,7 +71,7 @@ In the logistic regression setting, it can be more useful to consider the odds, 
 glm.fits<-glm(y~x1+x2, family = binomial,data=train)
 #summary(glm.fits)
 #coef(glm.fits)
-```
+
 ##Oppgave 3, classification
 #a)
 * By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear.
@@ -142,7 +136,16 @@ v) Sjekk x2=... er riktig
 vi)ok
 vii) Hvordan presentere alle sannsynlighetene?
 viii)$$\text{Pr}(Y_i = 1| {\bf X}={\bf x}_i) = p_i = \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}$$
+
 #b) K-nearest neighbor classifier 
+
+The equation 
+
+$$
+P(Y=1|X=x_0) = \frac{1}{K}\sum_{i\in \mathcal{N_0}}I(y_i=1).
+$$
+
+gives the probability that a test observation with predictor values $x_0$ has response value $Y=1$. This probability
 
 ```{r, echo=FALSE}
 
