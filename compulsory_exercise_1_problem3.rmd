@@ -1,9 +1,8 @@
-#---
-#<<<<<<< HEAD
-#title: "Compulsory exercise 1, problem 3"
-#output: html_document
+title: "compulsory_exercise_1_problem3.rmd"
+output:
+  pdf_document: default
+  html_document: default
 
-#---
 
 ## Problem 3a: Logistic Regression
 
@@ -24,23 +23,14 @@ $$
 Output:
 
 ``` {r, echo=FALSE}
-#=======
-  html_document:
-    df_print: paged
-  output: null
-  pdf_document: null
-editor_options:
-  chunk_output_type: console
----
 
-```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warnings=FALSE)
 knitr::opts_chunk$set(message =FALSE)
 ```
 
 ```{r, echo=FALSE}
->>>>>>> 332fc9404998211e691dc0694c7a57390cc3b665
+
 library(ggplot2)
 library(GGally)
 library(class)
@@ -60,7 +50,6 @@ set.seed(4268) #to get the same order if you rerun - but you change this to your
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
-<<<<<<< HEAD
 glm.fits=glm(y~x1+x2, family = binomial,data=train)
 summary(glm.fits)
 
@@ -183,7 +172,7 @@ $$\hat{\boldsymbol{\mu}}_k = \frac{1}{n_k}\sum_{i:y_i=k} {\bf X}_i$$.
 The $\Sigma$-matrix can be estimated for the two classes by summing up $$\hat{\boldsymbol{\Sigma}}_k=\frac{1}{n_k-1}\sum_{i:y_i=k} ({\bf X}_i-\hat{\boldsymbol{\mu}}_k ) ({\bf X}_i-\hat{\boldsymbol{\mu}}_k)^T$$, with $$\hat{\boldsymbol{\Sigma}}=\frac{(n_0 - 1) \cdot \hat{\boldsymbol{\Sigma}}_0 + (n_1 - 1) \cdot \hat{\boldsymbol{\Sigma}}_1}{n_1 + n_2 - 2}$$. Computing the estimates for these quantities from the train set, we get:
 
 ```{r, echo=FALSE}
-library(plyr)
+library(dplyr)
 
 
 n0=sum(train[,1]==1)
@@ -321,5 +310,26 @@ print(test_error)
 * The sensitivity is 0.833, and the specificity is 0.828. This is quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 ```
 
+
+```{r, eval=FALSE}
+library(pROC)
+glmroc=roc(response=test$y,predictor=predglm)
+plot(glmroc)
+auc(glmroc)
+
+KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
+KNN3probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = TRUE))$prob
+KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
+KNN3roc=roc(response=test$y,predictor=KNN3prob) 
+
+plot(KNN3roc)
+auc(KNN3roc)
+ltrain=lda(y~x1+x2,data=train)
+lpred=predict(object = ltrain, newdata = test)$posterior[,1]
+lroc=roc(response=test$y,lpred)
+plot(lroc)
+auc(lroc)
+```
+```
 
 
