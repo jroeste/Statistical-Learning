@@ -232,6 +232,32 @@ $$
 \log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})=\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}\\
 $$
 
+```{r, echo=FALSE}
+
+library(ggplot2)
+library(GGally)
+library(class)
+library(MASS)
+library(pROC)
+
+wine=read.csv("https://www.math.ntnu.no/emner/TMA4268/2018v/data/Comp1Wine.csv",sep=" ")
+wine$class=as.factor(wine$class-1)
+colnames(wine)=c("y","x1","x2")
+#ggpairs(wine, ggplot2::aes(color=y))
+
+```
+
+```{r, echo=FALSE}
+n=dim(wine)[1]
+set.seed(4268) #to get the same order if you rerun - but you change this to your favorite number
+ord = sample(1:n) #shuffle 
+test = wine[ord[1:(n/2)],]
+train = wine[ord[((n/2)+1):n],]
+
+glm.fits=glm(y~x1+x2, family = binomial,data=train)
+summary(glm.fits)
+```
+
 * A logistic regression model was fitted using the glm-function in R. In our case, the following values was found for the regression coefficients:
 
 $\hat\beta_0\approx 0.4909$ and $\hat\beta_1\approx 0.4109$ and $\hat\beta\approx -1.8828$. 
@@ -254,6 +280,7 @@ $$
 * Figure \ref(??) shows the plot of the training data, in addition to the boundary line found above.
 
 ```{r, echo=FALSE}
+
 b0=glm.fits$coefficients[1]
 b1=glm.fits$coefficients[2]
 b2=glm.fits$coefficients[3]
@@ -332,7 +359,7 @@ tknn9
 ```
 
 Sensitivity:
-```{r, echo=FASLE}
+```{r, echo=FALSE}
 sens_9 = tknn9[2,2]/(tknn9[1,2]+tknn9[2,2])
 sens_9
 
