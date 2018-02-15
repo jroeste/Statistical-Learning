@@ -129,7 +129,7 @@ Hei
 
 
 ##c)
-In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
+* In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
 ```{r, echo=FALSE}
 
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
