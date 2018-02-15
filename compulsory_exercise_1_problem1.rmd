@@ -8,7 +8,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## a) - Training and test MSE
-The $M=1000$ repetitions has a big spread in the range for both $k=1$ and $k=2$, and decreases when $k$ increases. The variance in error $\epsilon$ is constant over the domain, as expected from the sample drawn from the Normal distribution. ( ? Should we include this?) With $k=10$, in the domain from $x=-2.4$ to $x=2.4$, the spread is about halved. In the endpoints, the regression lines becomes horisontal, which does not correspond to the real $f(x)=1+x^2+x^3$. When $K=25$, this trend continues, where the domain with horisontal lines is between $[-3,-1.8]$ and $[1.8,3]$.  The regression lines from $[-1.8,1.8]$ are wrong. This is because with that many points, the model is much less flexible and shows trends that are wrong. For a low $K$, the model has the most flexible fit.
+Figure 4 shows that the $M=1000$ estimated models are spread over a relatively large range when $K=1$.This spread shrinkes while K increases. With $K=10$ this spread is approximately halved. However, as the K-value increase, the mean of the M repetitions deviates more from the underlying function. Especially in around the endpoints of the x-values, the regression lines for high K-value becomes horisontal, which does not correspond to $f(x)=1+x^2+x^3$.
+
+These observations can be explained by the variyng flexibility for different K-values. When the K-value is low, the flexibility is high, so the fitted model with $K=1$ vary a lot for different training data sets. On the other hand, a high K-values leads to low flexibility, which can lead to misleading fitted models in the sense that the estimated mean deviates from the true mean.
+
+In figure 5 the mean-squared errors for the training set is stricktly increasing. This is because for a lower K-value, the fitted model more precicely corresponds to the data points in the training set. However, this does not mean that the best model is with $K=1$, since some of the trends captured from the training data set might be due to randomness and not the actual trends in the underlying curve.
+
+To get an indication of which K-value is the best to choose, one has to compute the MSE-value for a test set of other data points than in the training set. For the test set the mean-qaured errors has a minimum value for K around 3 to 5 and increases for higher and lower values. This indicates that choosing a K-value from 3 to 5 would give the best model fit. 
 
 ## b)
 
