@@ -10,20 +10,20 @@ knitr::opts_chunk$set(message =FALSE)
 ```
 
 ##Problem 1
-#Task a)
+###Task a)
 
 * Answer to the first one.
 
 * Answer to the second one.
 
-#Task b)
+###Task b)
 
 * Answer to first one.
 
 * Answer to second one.
 
 ##Problem 2
-#Task a)
+###Task a)
 
 * Equation for fitted model: 
 
@@ -61,7 +61,7 @@ The value of the F-statistic is a result of performing the hypothesis test with 
 $$H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$$
 If the null hypothesis is correct, the F-statistic has expected value 1. If at least one of the parameters has real value above zero, the expected value of F is greater than 1. The F-statistic can thus be used to compare models. A model with higher F-statistic catches the correlations in the population better. 
 
-##b)
+###Task b)
 
 The proportion of variability explained by this model is 0.2494, given by the $R^2$-value. This means that about one forth of the variability in the -1/SYSBP data is explained by sex, age, current smoking, BMI, total cholesterol and anti-hypersensitive medication. Thus, about three forths of the veriability comes from other things that we haven't measured.
 
@@ -137,7 +137,7 @@ In the Q-Q-plot here more of the points deviate from the straight line. Also, th
 
 Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
 
-##c)
+###Task c)
 * In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
 ```{r, echo=FALSE}
 
@@ -180,7 +180,7 @@ When interpreting the confidence interval, it can be useful to consider the accu
 * Can we know anything about the p-value for a hypothesis test? In words, the null hypothesis $H_0: \beta_{BMI}=0$ is saying that "there is no relationship between $\beta_{BMI}$ and $-1/\sqrt{SYSBP}$".
  - We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero, i.e. we are 99 % confident that there in fact is a relationship. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI}$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01.
  
-#d)
+###Task d)
  
 Now, we are considering a new observation, namely 
 ```{r, echo=FALSE}
@@ -216,8 +216,8 @@ $[107.9, 168.28]$.
 
 * The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear.  
 
-##Oppgave 3, classification
-#a) - Logistic Regression
+##Problem 3
+###Taska) Logistic Regression
 * By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear.
 
 $$
@@ -306,7 +306,7 @@ vi)ok
 vii) Hvordan presentere alle sannsynlighetene?
 viii)$$\text{Pr}(Y_i = 1| {\bf X}={\bf x}_i) = p_i = \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}$$
 
-#b) K-nearest neighbor classifier 
+###Task b) K-nearest neighbor classifier 
 
 The equation 
 
@@ -372,7 +372,7 @@ spec_9
 
 ```
 
-#c) LDA (& QDA)
+###Task c) LDA (& QDA)
 
 * $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2.$\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\Sigma$ is the covariate matrix.
 
@@ -519,7 +519,7 @@ print(test_error)
 ```
 * The sensitivity is 0.833, and the specificity is 0.828. This is quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 
-## d)
+###Task d)
 ```{r, eval=FALSE}
 library(pROC)
 glmroc=roc(response=test$y,predictor=predglm)
