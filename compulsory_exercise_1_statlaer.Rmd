@@ -167,9 +167,8 @@ The estimated coefficients can be iterpreted as a measure on how much each covar
 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99$% confident to find $\beta_{BMI}$. It can be proven that $\boldsymbol{\hat\beta}$ ~ $N(\boldsymbol\beta,\sigma^2(\mathbf{X^TX})^{-1})$, where $\sigma^2$ is estimated using the relationship $\hat\sigma^2=RSS/(n-p-1)$, where p is the number of covariates estimated, and $\frac{(n-p-1)\hat\sigma^2}{\sigma^2}$~$\chi^2_{n-p-1}$. For the particular coefficient $\hat\beta_{BMI}$, we have that the parameter has the chi-square distribution with $n-2$ degrees of freedom. The $(1-\alpha)100$% confidence interval can then be constructed.
 
 $$
-P(-t_{\alpha/2,n-2} \leq\frac{\hat\beta-\beta}{\sqrt{c_{jj}\hat\sigma^2}} \leq_{\alpha/2,n-2}) = 1-\alpha \\ 
+P(-t_{\alpha/2,n-2} \leq\frac{\hat\beta-\beta}{\sqrt{c_{jj}\hat\sigma^2}} \leq t_{\alpha/2,n-2}) = 1-\alpha \\ 
 P(\hat\beta_{BMI}-t_{0.005,n-2}\sqrt{c_{jj}\hat\sigma^2} \leq \beta \leq \hat\beta_{BMI}-t_{0.005,n-2}\sqrt{\hat\sigma^2c_{jj}})=1-\alpha
-
 $$
 Here, the $c_{jj}$ is the diagonal element of $\mathbf{(X^TX)^{-1}}$ corresponding to $\hat\beta_{BMI}$.
 
@@ -214,7 +213,7 @@ new=cbind(1,new)
 new
 ```
 
-* Using `modelA`, one obtain the value $0.0867$ for his $1/\sqrt{SYSBP}$ and $133$ for his $SYSBP$. The code output is shown below.
+Using `modelA`, one obtain the value $0.0867$ for his $1/\sqrt{SYSBP}$ and $133$ for his $SYSBP$. The code output is shown below.
 
 ```{r, echo=FALSE}
 Y=coef(modelA)%*%t(new)
@@ -222,8 +221,20 @@ Y
 bp=(1/(-Y)^2)
 bp
 ```
+We want to construct a 90% prediction interval for our prediction, and name the prediction for the response $\mathbf{\hat{Y}}=\mathbf{x_0^T}\boldsymbol{\beta}$ and constuct the expression for the prediction interval for $\mathbf{Y}$:
 
-* Construct a 90% prediction interval for the new observation: 
+$$
+
+P( \mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}} \leq \mathbf{Y_0} \leq\mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}} ) = 1-\alpha \\ 
+
+$$
+Where $\mathbf{x_0}$ is the covariates measured, $p$ is the number of covariates.
+So a prediction interval for our response can be expressed as
+$$
+[\mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}}, \mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}}]
+$$
+The R-function ´predict()´ gives the $90$% rpediction interval
+We construct a 90% prediction interval for the new observation: 
 ```{r, echo=FALSE}
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
 
@@ -235,7 +246,7 @@ predict(modelA,new,interval='predict',level=0.90)
 Transformed to `SYSBP`, we get the prediction interval
 $[107.9, 168.28]$.
 
-* The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear.  
+The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear. This is also easily observed,as our ´SYSBP´ prediction is not the centre of the ´SYSBP´ 90% PI.
 
 ##Problem 3
 ###Taska) Logistic Regression
