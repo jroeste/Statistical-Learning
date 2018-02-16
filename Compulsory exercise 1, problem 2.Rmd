@@ -1,6 +1,8 @@
 ---
 title: "Compulsory exercise 1, problem 2"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -129,7 +131,7 @@ Hei
 
 
 ##c)
-In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
+* In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
 ```{r, echo=FALSE}
 
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
@@ -139,19 +141,30 @@ summary(modelA)
 
 ```
 
-* The estimated numerical value of $\hat\beta_{BMI}$ can be read out of the summary: $\hat\beta_{BMI}\approx 3.087 \cdot 10^{-4}$.
+* The estimated numerical value of $\hat\beta_{BMI}$ can be read out of the summary: $\hat\beta_{BMI}= 3.087 \cdot 10^{-4}$.
 
-* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087\cdot10^{-4}$.
+* The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response caused by a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the change in the predicted response is $-3.087\cdot10^{-4}$.
 
-* 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99%$ confident to find $\beta_{BMI}$. It can be found using the standard error from the fitted model, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955 \cdot 10^{-5}$. The confidence interval is given by
+* 99% confidence interval for  $\beta_{BMI}$ is the interval we are $99%$ confident to find $\beta_{BMI}$. In order to find the interval, we need to find an estimate for the standard deviation, which is given by the $residual standard error$, RSE
+
+$$
+RSE=\sqrt\frac{{RSS}}{n-2},
+$$
+Where the $RSS$ is the $residual sum of squares$. This is the value called standard error, $SE(\hat\beta)$ that we can read out of the summary from the fitted model in the output of the R-code above, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\bar x)}=2.955 \cdot 10^{-5}$. For this model we assume that the error terms for each observation is uncorrelated with common variance. Now we can derive an expression for a $(1-\alpha)100%$ confidence interval for $\beta_{BMI}$, which follows a T-distribution with $n-2$ degrees of freedom.
+
+$$
+P(-t_{\alpha/2}\leq \frac{\hat\beta-\beta}{})
+$$
 
 $$
 \hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI})
 $$
+
 where the t-distribuition can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.01$, so 
 $$
 \hat\beta_{BMI}\pm z_{\alpha/2}\cdot SE(\hat\beta_{BMI}),
 $$
+
 where $z_{\alpha/2}=z_{0.01/2}=2.576$, so the confidence interval is
 
 $$
