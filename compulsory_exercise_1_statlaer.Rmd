@@ -164,7 +164,16 @@ The estimated coefficients can be expressed as $\boldsymbol{\hat\beta}=(\mathbf{
 
 The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087\cdot10^{-4}$.
 
-99% confidence interval for  $\beta_{BMI}$ is the interval we are $99$% confident to find $\beta_{BMI}$. It can be proven that $\boldsymbol{\hat\beta}$ ~ $N(\boldsymbol\beta,\sigma^2(\mathbf{X^TX})^{-1})$, where $\sigma^2$ is estimated using the relationship $\hat\sigma^2=RSS/(n-p-1)$, where p is the number of covariates estimated, and $\frac{(n-p-1)\hat\sigma^2}{\sigma^2}$~$\chi^2_{n-p-1}$. For the particular coefficient $\hat\beta_{BMI}$, we have that the parameter has the chi-square distribution with $n-2$ degrees of freedom. The $(1-\alpha)100$% confidence interval can then be constructed. The values needed can be found using the output from the fitted model in R. We are interested in the standard error for $\beta_{BMI}$ which gives us the square root of the estimated variance. In our case,  $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955 \cdot 10^{-5}$. The confidence interval is given by
+99% confidence interval for  $\beta_{BMI}$ is the interval we are $99$% confident to find $\beta_{BMI}$. It can be proven that $\boldsymbol{\hat\beta}$ ~ $N(\boldsymbol\beta,\sigma^2(\mathbf{X^TX})^{-1})$, where $\sigma^2$ is estimated using the relationship $\hat\sigma^2=RSS/(n-p-1)$, where p is the number of covariates estimated, and $\frac{(n-p-1)\hat\sigma^2}{\sigma^2}$~$\chi^2_{n-p-1}$. For the particular coefficient $\hat\beta_{BMI}$, we have that the parameter has the chi-square distribution with $n-2$ degrees of freedom. The $(1-\alpha)100$% confidence interval can then be constructed.
+
+$$
+P(-t_{\alpha/2,n-2} \leq\frac{\hat\beta-\beta}{\sqrt{c_{jj}\hat\sigma^2}} \leq_{\alpha/2,n-2}) = 1-\alpha \\ 
+P(\hat\beta_{BMI}-t_{0.005,n-2}\sqrt{c_{jj}\hat\sigma^2} \leq \beta \leq \hat\beta_{BMI}-t_{0.005,n-2}\sqrt{\hat\sigma^2c_{jj}})=1-\alpha
+
+$$
+Here, the $c_{jj}$ is the diagonal element of $\mathbf{(X^TX)^{-1}}$ corresponding to $\hat\beta_{BMI}$.
+
+The values needed to compute the estimate of the variance can be found using the output from the fitted model in R. We are interested in the standard error for $\beta_{BMI}$ which gives us the square root of the estimated variance. In our case,  $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955 \cdot 10^{-5}$. The confidence interval is given by
 
 $$
 \hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI})
