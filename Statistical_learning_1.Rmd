@@ -266,6 +266,111 @@ $[107.9, 168.28]$.
 
 The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear. This is also easily observed, as our `SYSBP` prediction is not the centre of the `SYSBP` 90% PI.
 
+##Problem 3
+###Task a) Logistic Regression
+
+By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear.
+
+$$
+\text{logit}(p_i)=\log ( \frac{p_i}{1-p_i})=\log(p_i)-\log(1-p_i)
+=
+\log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})-\log(1-\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}) \\
+=
+\log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} ) - \log(\frac{1+e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}-e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}{1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})\\
+=
+\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})-[\log(1)-\log(1+e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})]\\
+=
+\log(e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}})=\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}\\
+$$
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(GGally)
+library(class)
+library(MASS)
+library(pROC)
+
+wine=read.csv("https://www.math.ntnu.no/emner/TMA4268/2018v/data/Comp1Wine.csv",sep=" ")
+wine$class=as.factor(wine$class-1)
+colnames(wine)=c("y","x1","x2")
+#ggpairs(wine, ggplot2::aes(color=y)) #plotte denne?
+```
+
+```{r, echo=FALSE}
+n=dim(wine)[1]
+set.seed(1828) #to get the same order if you rerun - but you change this to your favorite number
+ord = sample(1:n) #shuffle 
+test = wine[ord[1:(n/2)],]
+train = wine[ord[((n/2)+1):n],]
+
+glm.fits=glm(y~x1+x2, family = binomial,data=train)
+summary(glm.fits)
+```
+
+A logistic regression model was fitted using the glm-function in R. In our case, the following values was found for the regression coefficients:
+SEED!!
+$\hat\beta_0\approx 0.4909$ and $\hat\beta_1\approx 0.4109$ and $\hat\beta2\approx -1.8828$. 
+
+
+In the logistic regression setting, it can be more useful to consider the odds, $p_i/(1-p_i)$, rather than the probability $p_i$ as $p_i$ is an exponential function. In our case, $p_i$ is the conditional probability that a wine is in class 1, given color and alcalinity. 1 - $p_i$ is the conditional probability that the wine is in class 0.
+As shown above, logit($p_i$) is a linear function of the two covariates $x_{i1}$ and $x_{i2}$. If we keep one of the covariates constant, say $x_{i2}$ and increase $x_{i1}$ by 1 unit, logit($p_i$) will increase linearly with $\beta_1$. This means the odds itself will be multiplied with $exp(\beta_1)$. In other words, if for now only considering the alkalinity of ash in wine, a higher value for the covariate measuring this will give a higher odds for the wine being in class 1. Similarly, since $\beta_2$ is negative, an increase in the color intensity of a wine will give a decrease in the odds of the wine being in class 1, i.e. more likely to be in class 2. 
+
+By using the rule $\text{Pr}(Y_i = 1|{\bf x}) = p_i > 0.5$ for classifying an observation to class 1, we found:
+
+$$
+0.5> \frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}} \\
+0.5\cdot ({ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})>e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\
+0.5>0.5\cdot e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}} \\ 
+\log(1)>\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} \\
+x_{i2}<-\beta_0-\beta_1x_1
+$$
+The figure below shows the plot of the training data, in addition to the boundary line found above.
+
+```{r, echo=FALSE}
+
+b0=glm.fits$coefficients[1]
+b1=glm.fits$coefficients[2]
+b2=glm.fits$coefficients[3]
+#plotting training data
+#plot(train$y)
+#a=(log(0.5)-b0)/b2
+b=-b1/b2
+a=(-b0)/b2
+
+ggplot(train,mapping=aes(x=x1,y=x2,color=y))+ggtitle('Training observations')+geom_point() + geom_abline(slope=b, intercept=a)
+```
+The sensitivity and specificity is given by the following formulaes:
+$$Spec=\frac{\text{Correctly predicted no. in class 0}}{\text{Actual no. of wines in class 0}}$$
+$$Sens=\frac{\text{Correctly predicted no. in class 1}}{\text{Actual no. of wines in class 1}}$$
+
+
+
+```{r,echo=FALSE}
+#Confusion table
+probs_wine1<- predict(glm.fits, test,type="response") 
+#summary(probs_wine1)
+pred_wine1<-rep("0",65)
+pred_wine1[probs_wine1>0.5]="1"
+t_log=table(pred_wine1,(test$y))
+t_log
+
+x_1=17
+x_2=3
+p_i=(exp(b0+b1*x_1+b2*x_2))/(1+exp(b0+b1*x_1+b2*x_2))
+p_i
+
+#compute predicted probabilities
+predictions_wine1=data.frame(probs_wine1,pred_wine1,test[,1])
+colnames(predictions_wine1)=c("Estimated prob","Predicted class","True class")
+sens_log=t_log[2,2]/(t_log[1,2]+t_log[2,2])
+spec_log=t_log[1,1]/(t_log[1,1]+t_log[2,1])
+sens_log
+spec_log
+```
+SEED!
+The probability of being in class 1, given $x_1=17$ and $x_2=3$ is 0.929. Thus it is quite likely that this observation is in class 1. 
+From the confusion table and the sensitivity and specificity, we see that classifier does not classify all the test observations correctly.
+
 ###Task b) K-nearest neighbor classifier 
 
 The equation 
@@ -335,3 +440,164 @@ spec_9
 For K=9 the sensitivity is lower that for K=3, indicating that the classifier with K=3 is better. However, the data set is not so large, so this difference is due to a few single wines. This means that we cannot be certain of which of the K-values that are best. 
 
 Because of the bias-variance trade-off we don't choose the K-value as low or high as possible. 
+
+
+###Task c) LDA (& QDA)
+
+$\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2. $\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\boldsymbol{\Sigma}$ is the covariate matrix.
+
+We can estimate the prior probability $\pi_k$ for the wines by taking the fraction of observations from class $k$: $\hat{\pi}_k = \frac{n_k}{n},$ where $n$ is the total number of observations. $\mu_k$ can be estimated from the sample mean:  
+$$\hat{\boldsymbol{\mu}}_k = \frac{1}{n_k}\sum_{i:y_i=k} {\bf X}_i.$$
+
+The $\Sigma$-matrix can be estimated for the two classes by $$\hat{\boldsymbol{\Sigma}}=\frac{(n_0 - 1) \cdot \hat{\boldsymbol{\Sigma}}_0 + (n_1 - 1) \cdot \hat{\boldsymbol{\Sigma}}_1}{n_1 + n_2 - 2}, $$ where $$\hat{\boldsymbol{\Sigma}}_k=\frac{1}{n_k-1}\sum_{i:y_i=k} ({\bf X}_i-\hat{\boldsymbol{\mu}}_k ) ({\bf X}_i-\hat{\boldsymbol{\mu}}_k)^T. $$ Computing the estimates for these quantities from the train set, we get:
+
+```{r, echo=FALSE}
+library(dplyr)
+n0=sum(train[,1]==1)
+n1=nrow(train)-n0
+pi=c(n0/n,n1/n)
+x_01=train[train$y==0,"x1"]
+x_02=train[train$y==0,"x2"]
+x_11=train[train$y==1,"x1"]
+x_12=train[train$y==1,"x2"]
+mu_0=c(mean(x_01),mean(x_02))
+mu_1=c(mean(x_11),mean(x_12))
+Sigma_0=var(train[train$y==0,2:3])
+Sigma_1=var(train[train$y==1,2:3])
+Sigma=(n0-1)*Sigma_0/(n0+n1-2)+(n1-1)*Sigma_1/(n0+n1-2)
+```
+The estimates for $p_i$, $\mu_0$, $\mu_1$ and \$Sigma$ are given here:
+```{r,,echo=FALSE,eval=TRUE}
+pi
+
+mu_0
+
+mu_1
+
+Sigma
+
+
+```
+The desicion boundary is where $P_0(\bf{x})=P_1(\bf{x})$, which can be rewritten to discriminant scores $\delta_0(\bf{x})$=$\delta_1(\bf{x})$ for the two wine classes.
+
+$$
+\text{Pr}(Y=0|{\bf X=x})=\text{Pr}(Y=1|{\bf X=x})\\
+$$
+
+$$
+\pi_0 \frac{1}{(2 \pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2} \sum_{l=1}^2 \pi_l f_l({\bf x}) }e^{-\frac{1}{2}({\bf x}-\boldsymbol{\mu_0})^T \boldsymbol{\Sigma}^{-1}({\bf x}-\boldsymbol{\mu_0})}
+=
+\pi_1 \frac{1}{(2 \pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2} \sum_{l=1}^2 \pi_l f_l({\bf x})}e^{-\frac{1}{2}({\bf x}-\boldsymbol{\mu_1})^T \boldsymbol{\Sigma}^{-1}({\bf x}-\boldsymbol{\mu_1})} \\
+$$
+Taking the logarithms on each side gives:
+$$
+\log \pi_0 -\frac{1}{2}({\bf x}-\boldsymbol{\mu_0})^T \boldsymbol{\Sigma}^{-1}({\bf x}-\boldsymbol{\mu_0})
+=
+\log \pi_1-\frac{1}{2}({\bf x}-\boldsymbol{\mu_1})^T \boldsymbol{\Sigma}^{-1}({\bf x}-\boldsymbol{\mu_1})
+$$
+
+Since $\Sigma$ is symmetric positive definite, the two off-diagonal elements in $\Sigma$, $\sigma_12$ and $\sigma_21$ are equal. Then ${\bf x}^T\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu_k} = \boldsymbol{\mu_k}^T\boldsymbol{\Sigma}^{-1}{\bf x}$. Due to this and subtracting ${\bf x}^T\boldsymbol{\Sigma}^{-1}{\bf x}$ from both sides, the equation reduces to:
+
+$$
+\log \pi_0 -\frac{1}{2}\boldsymbol{\mu_0}^T \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu_0} + {\bf x}^T{\Sigma}^{-1}\boldsymbol{\mu_0}
+=
+\log \pi_1 -\frac{1}{2}\boldsymbol{\mu_1}^T \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu_1} + {\bf x}^T{\Sigma}^{-1}\boldsymbol{\mu_1},\\
+$$
+
+which is $\delta_0(\bf{x})=\delta_1(\bf{x})$.
+
+The rule for classification can use the discriminant values. If $\delta_1(\bf{x})$ is greater than $\delta_0(\bf{x})$, i.e.
+
+
+$$
+\delta_1(\bf{x})-\delta_0(\bf{x})>0 \\
+{\bf x}^T \boldsymbol{\Sigma}^{-1}\boldsymbol{(\mu_1-\mu_0)} - \frac{1}{2}\boldsymbol\mu_1^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_1 + \frac{1}{2}\boldsymbol\mu_0^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_0 + \log \frac{\pi_1}{\pi_0} > 0\\
+$$
+
+
+then $\boldsymbol{x}$ is assigned to class 1.
+
+$$
+{\bf x}^T \boldsymbol{\Sigma}^{-1}\boldsymbol{(\mu_1-\mu_0)} =\frac{1}{2}\boldsymbol\mu_1^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_1 - \frac{1}{2}\boldsymbol\mu_0^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_0 - \log \frac{\pi_1}{\pi_0} \\
+$$
+
+Solving this equation with the estimates for $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, gives the $\bf{x}$-values needed to find the boundary line. 
+
+
+```{r,echo=FALSE}
+right_side=0.5*t(mu_1)%*%solve(Sigma)%*%mu_1-0.5*t(mu_0)%*%solve(Sigma)%*%mu_0-log(pi[2]/pi[1])
+left_side=solve(Sigma)%*%(mu_1-mu_0)
+const_1=left_side[1]
+const_2=left_side[2]
+train_intercept=right_side/const_2
+train_slope=-const_1/const_2
+```
+SEED!
+This gives the following equation for the boundary line: $0.164x_1-2.628x_2=-8.368 \rightarrow x_2=3.184+0.063x_1$.
+
+```{r,echo=FALSE}
+library(MASS)
+
+library(ggplot2)
+
+#Plotting train and test-data. 
+train_plot=ggplot(train,aes(x=x1,y=x2,color=y))+geom_point(size=2.5)+geom_abline(slope=train_slope,intercept=train_intercept,color="green3")+geom_point(data=test,shape=5,size=2.5)
+train_plot
+
+#Performed LDA
+lda.train=lda(y~x1+x2,data=train)
+lda.train_pred=predict(lda.train,newdata=test)
+
+
+```
+
+```{r,echo=FALSE}
+#Creating confusion table
+library(knitr)
+library(kableExtra)
+
+conf_table=table(lda.train_pred$class,test$y)
+
+# row1 = c("", "Predicted -", "Predicted +","Total")
+# row2 = c("True -", conf_table[1,1], conf_table[1,2],sum(conf_table[1,]))
+# row3 = c("True +", conf_table[2,1], conf_table[2,2],sum(conf_table[2,]))
+# row4 = c("Total", sum(conf_table[,1]), sum(conf_table[,2])," ")
+# table_wine=kable(rbind(row2, row3,row4),col.names=row1,row.names=FALSE)
+# table_wine
+
+total=sum(conf_table)
+ratio_LDA=(conf_table[1,1]+conf_table[2,2])/total
+test_error_LDA=(conf_table[1,2]+conf_table[2,1])/total
+
+#Calculating sensitivity and specificity
+sens_LDA=conf_table[2,2]/sum(conf_table[2,])
+spec_LDA=conf_table[1,1]/sum(conf_table[1,])
+``` 
+
+Sensitivity:
+```{r,echo=FALSE}
+print(sens_LDA)
+```
+
+Specificity:
+```{r,echo=FALSE}
+print(spec_LDA)
+```
+```{r,echo=FALSE}
+print(ratio_LDA)
+print(test_error_LDA)
+```
+SEED
+The sensitivity is 0.833, and the specificity is 0.828. This looks quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
+
+
+The most important difference between the LDA and the QDA philosophy is that the covariance matrices for the classes are assumed equal for LDA and non-equal for QDA. When assuming non-equal matrices for QDA, the discriminant equation for finding the boundary line will change. It will not be possible to subtract ${\bf x}^T\boldsymbol{\Sigma}^{-1}{\bf x}$ from each side, since on left side we have $\boldsymbol{\Sigma_0}^{-1}$ and $\boldsymbol{\Sigma_1}^{-1}$ on right side. This results in a quadratic relation of the $\bf{x}$'es for the equation, and the boundary line will have a quadratic form. 
+
+We will use LDA when our assumtion is right, i.e. the covariance matrices for the two classes are equal. If they in reality are non-equal, the LDA method may suffer from high bias when estimating the parameters. 
+In our case we get the estimates for $\Sigma_0$ and $\Sigma_1$ like this: 
+```{r,echo=TRUE}
+Sigma_0
+Sigma_1
+Sigma
+```
+These estimates for $\Sigma_0$ and $\Sigma_1$ are not equal each other, but when changing the seed, the covariate matrices changes a lot. It is then not enough to evaluate whether or not they really are equal enough. Performing cross validation, i.e. changing the divison of training data and test data many times would give a more certain result. However, it looks like the trend is that $\Sigma_1$ has a higher variance for the alcalinity of ash, $x_1$ than $\Sigma_0$ has. Also, $\Sigma_0$ has a higher variance for the color intensity, $x_2$ than $\Sigma_1$. 
