@@ -265,6 +265,7 @@ test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
 
 glm.fits=glm(y~x1+x2, family = binomial,data=train)
+glm.fits
 summary(glm.fits)
 ```
 
@@ -576,7 +577,7 @@ spec_LDA
 ```
 
 When comparing the three methods based on cut-off with 0.5, we see that [method ] has the highest sensitivity and specificity. Based on this, we prefer to use [method]  . 
-An ROC curve compares the sensitivity and specificity up against each other. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical to evalute which classification method is the best when comparing sensitivity and specificity. 
+An ROC curve compares the sensitivity and specificity up against each other for all values of the cut off. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical method to evalute which classification method is the best when comparing sensitivity and specificity. 
 ```{r, eval=FALSE}
 library(pROC)
 #glmroc=roc(response=test$y,predictor=predglm)
@@ -584,27 +585,24 @@ library(pROC)
 #auc(glmroc)
 
 #Logistic
-#LOGroc=roc(response=test$y,predictor=)
+LOGroc=roc(response=test$y,predictor=probs_wine1)
 
 #K=3
 KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
 KNN3probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = TRUE))$prob
 KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
 KNN3roc=roc(response=test$y,predictor=KNN3prob)
-KNN3roc
 
+#LDA
+LDAroc=roc(response=test$y,predictor=lda.train_pred$posterior[,2])
 
-plot(KNN3roc,col="green")
-lines(KNN9roc,col="red")
+plot(LOGroc,col="green")
+lines(KNN3roc,col="red")
+lines(LDAroc,col="blue")
+auc(LOGroc)
 auc(KNN3roc)
-auc(KNN9roc)
-
-
-# ltrain=lda(y~x1+x2,data=train)
-# lpred=predict(object = ltrain, newdata = test)$posterior[,1]
-# lroc=roc(response=test$y,lpred)
-# plot(lroc)
-# auc(lroc)
+auc(LDAroc)
 ```
+We see here that KNN with $k=3$ is best in the cut-off 0.5. For other cut-offs, LDA and Logistic regression are the best. When comparing auc-values, LDA has the highest value. 
 
 
