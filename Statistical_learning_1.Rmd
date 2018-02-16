@@ -33,7 +33,13 @@ The goal is to reduce the total error of the regression model, which is
 $$\text{E}[(Y - \hat{f}(x_0))^2]=\text{Var}(\varepsilon) +  \text{Var}[\hat{f}(x_0)]+[\text{Bias}(\hat{f}(x_0))]^2$$
 
 
-The variance for a given x-value is calculated as the sample variance of the predicted values from the M regression models. The bias is calculated from the difference of the mean of the predicted values and the true response value. 
+Variance can be interpreted as the spred of the fitted models, and bias as difference of the expected value of the estimated function and the true function. Matematically this is:
+
+$$Bias = E[\hat{f}(x)-f(x)]$$
+
+$$Variance = E[\hat{f}(x)^2]-E[\hat{f}(x)]^2$$
+
+The extepcted values of the estimated function is calculated as the average of the M repetitions.
 
 When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
 
@@ -590,7 +596,6 @@ print(test_error_LDA)
 SEED
 The sensitivity is 0.833, and the specificity is 0.828. This looks quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 
-
 The most important difference between the LDA and the QDA philosophy is that the covariance matrices for the classes are assumed equal for LDA and non-equal for QDA. When assuming non-equal matrices for QDA, the discriminant equation for finding the boundary line will change. It will not be possible to subtract ${\bf x}^T\boldsymbol{\Sigma}^{-1}{\bf x}$ from each side, since on left side we have $\boldsymbol{\Sigma_0}^{-1}$ and $\boldsymbol{\Sigma_1}^{-1}$ on right side. This results in a quadratic relation of the $\bf{x}$'es for the equation, and the boundary line will have a quadratic form. 
 
 We will use LDA when our assumtion is right, i.e. the covariance matrices for the two classes are equal. If they in reality are non-equal, the LDA method may suffer from high bias when estimating the parameters. 
@@ -601,3 +606,48 @@ Sigma_1
 Sigma
 ```
 These estimates for $\Sigma_0$ and $\Sigma_1$ are not equal each other, but when changing the seed, the covariate matrices changes a lot. It is then not enough to evaluate whether or not they really are equal enough. Performing cross validation, i.e. changing the divison of training data and test data many times would give a more certain result. However, it looks like the trend is that $\Sigma_1$ has a higher variance for the alcalinity of ash, $x_1$ than $\Sigma_0$ has. Also, $\Sigma_0$ has a higher variance for the color intensity, $x_2$ than $\Sigma_1$. 
+
+
+###Task d)
+Sensitivity for Logistic, KNN with $k=3$ and LDA:
+```{r,echo=TRUE}
+sens_log
+sens_3
+sens_LDA
+```
+Specificity for Logistic, KNN with $k=3$ and LDA:
+```{r, echo=TRUE}
+spec_log
+spec_3
+spec_LDA
+
+```
+
+When comparing the three methods based on cut-off with 0.5, we see that [method ] has the highest sensitivity and specificity. Based on this, we prefer to use [method]  . 
+An ROC curve compares the sensitivity and specificity up against each other for all values of the cut off. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical method to evalute which classification method is the best when comparing sensitivity and specificity. 
+```{r, eval=FALSE}
+library(pROC)
+#glmroc=roc(response=test$y,predictor=predglm)
+#plot(glmroc)
+#auc(glmroc)
+
+#Logistic
+LOGroc=roc(response=test$y,predictor=probs_wine1)
+
+#K=3
+KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
+KNN3probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = TRUE))$prob
+KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
+KNN3roc=roc(response=test$y,predictor=KNN3prob)
+
+#LDA
+LDAroc=roc(response=test$y,predictor=lda.train_pred$posterior[,2])
+
+plot(LOGroc,col="green")
+lines(KNN3roc,col="red")
+lines(LDAroc,col="blue")
+auc(LOGroc)
+auc(KNN3roc)
+auc(LDAroc)
+```
+We see here that KNN with $k=3$ is best in the cut-off 0.5. For other cut-offs, LDA and Logistic regression are the best. When comparing auc-values, LDA has the highest value.
