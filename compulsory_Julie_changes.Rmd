@@ -259,7 +259,7 @@ colnames(wine)=c("y","x1","x2")
 
 ```{r, echo=FALSE}
 n=dim(wine)[1]
-set.seed(4268) #to get the same order if you rerun - but you change this to your favorite number
+set.seed(1828) #to get the same order if you rerun - but you change this to your favorite number
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
@@ -425,10 +425,15 @@ Sigma=(n0-1)*Sigma_0/(n0+n1-2)+(n1-1)*Sigma_1/(n0+n1-2)
 ```
 The estimates for $p_i$, $\mu_0$, $\mu_1$ and \$Sigma$ are given here:
 ```{r,,echo=FALSE,eval=TRUE}
-Sigma
-mu_0
-mu_1
 pi
+
+mu_0
+
+mu_1
+
+Sigma
+
+
 ```
 The desicion boundary is where $P_0(\bf{x})=P_1(\bf{x})$, which can be rewritten to discriminant scores $\delta_0(\bf{x})$=$\delta_1(\bf{x})$ for the two wine classes.
 
@@ -472,11 +477,11 @@ then $\boldsymbol{x}$ is assigned to class 1.
 $$
 {\bf x}^T \boldsymbol{\Sigma}^{-1}\boldsymbol{(\mu_1-\mu_0)} =\frac{1}{2}\boldsymbol\mu_1^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_1 - \frac{1}{2}\boldsymbol\mu_0^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_0 - \log \frac{\pi_1}{\pi_0} \\
 $$
+
 Solving this equation with the estimates for $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, gives the $\bf{x}$-values needed to find the boundary line. 
 
 
 ```{r,echo=FALSE}
-
 right_side=0.5*t(mu_1)%*%solve(Sigma)%*%mu_1-0.5*t(mu_0)%*%solve(Sigma)%*%mu_0-log(pi[2]/pi[1])
 left_side=solve(Sigma)%*%(mu_1-mu_0)
 const_1=left_side[1]
@@ -484,7 +489,7 @@ const_2=left_side[2]
 train_intercept=right_side/const_2
 train_slope=-const_1/const_2
 ```
-
+SEED!
 This gives the following equation for the boundary line: $0.164x_1-2.628x_2=-8.368 \rightarrow x_2=3.184+0.063x_1$.
 
 ```{r,echo=FALSE}
@@ -499,8 +504,7 @@ train_plot
 #Performed LDA
 lda.train=lda(y~x1+x2,data=train)
 lda.train_pred=predict(lda.train,newdata=test)
-lda.train_pred
-conf_table=table(lda.train_pred$class,test$y)
+
 
 ```
 
@@ -509,51 +513,78 @@ conf_table=table(lda.train_pred$class,test$y)
 library(knitr)
 library(kableExtra)
 
-row1 = c("", "Predicted -", "Predicted +","Total")
-row2 = c("True -", conf_table[1,1], conf_table[1,2],sum(conf_table[1,]))
-row3 = c("True +", conf_table[2,1], conf_table[2,2],sum(conf_table[2,]))
-row4 = c("Total", sum(conf_table[,1]), sum(conf_table[,2])," ")
-table_wine=kable(rbind(row2, row3,row4),col.names=row1,row.names=FALSE)
-table_wine
+conf_table=table(lda.train_pred$class,test$y)
+
+# row1 = c("", "Predicted -", "Predicted +","Total")
+# row2 = c("True -", conf_table[1,1], conf_table[1,2],sum(conf_table[1,]))
+# row3 = c("True +", conf_table[2,1], conf_table[2,2],sum(conf_table[2,]))
+# row4 = c("Total", sum(conf_table[,1]), sum(conf_table[,2])," ")
+# table_wine=kable(rbind(row2, row3,row4),col.names=row1,row.names=FALSE)
+# table_wine
 
 total=sum(conf_table)
-ratio=(conf_table[1,1]+conf_table[2,2])/total
-test_error=(conf_table[1,2]+conf_table[2,1])/total
+ratio_LDA=(conf_table[1,1]+conf_table[2,2])/total
+test_error_LDA=(conf_table[1,2]+conf_table[2,1])/total
 
 #Calculating sensitivity and specificity
-wine_sens=conf_table[2,2]/sum(conf_table[2,])
-wine_spec=conf_table[1,1]/sum(conf_table[1,])
+sens_LDA=conf_table[2,2]/sum(conf_table[2,])
+spec_LDA=conf_table[1,1]/sum(conf_table[1,])
 ``` 
 
 Sensitivity:
 ```{r,echo=FALSE}
-print(wine_sens)
+print(sens_LDA)
 ```
 
 Specificity:
 ```{r,echo=FALSE}
-print(wine_spec)
+print(spec_LDA)
 ```
 ```{r,echo=FALSE}
 print(ratio)
 print(test_error)
 ```
 SEED
-The sensitivity is 0.833, and the specificity is 0.828. This is quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
+The sensitivity is 0.833, and the specificity is 0.828. This looks quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 
-????
-The most important difference between the LDA and the QDA philosophy is that the covariance matrices are different for QDA and assumes equal for LDA. In our task we got different ???
+
+The most important difference between the LDA and the QDA philosophy is that the covariance matrices for the classes are assumed equal for LDA and non-equal for QDA. When assuming non-equal matrices for QDA, the discriminant equation for finding the boundary line will change. It will not be possible to subtract ${\bf x}^T\boldsymbol{\Sigma}^{-1}{\bf x}$ from each side, since on left side we have $\boldsymbol{\Sigma_0}^{-1}$ and $\boldsymbol{\Sigma_1}^{-1}$ on right side. This results in a quadratic relation of the $\bf{x}$'es for the equation, and the boundary line will have a quadratic form. 
+
+We will use LDA when our assumtion is right, i.e. the covariance matrices for the two classes are equal. If they in reality are non-equal, the LDA method may suffer from high bias when estimating the parameters. 
+In our case we get the estimates for $\Sigma_0$ and $\Sigma_1$ like this: 
+```{r,echo=TRUE}
+Sigma_0
+Sigma_1
+Sigma
+```
+These estimates for $\Sigma_0$ and $\Sigma_1$ are not equal each other, but when changing the seed, the covariate matrices changes a lot. It is then not enough to evaluate whether or not they really are equal enough. Performing cross validation, i.e. changing the divison of training data and test data many times would give a more certain result. However, it looks like the trend is that $\Sigma_1$ has a higher variance for the alcalinity of ash, $x_1$ than $\Sigma_0$ has. Also, $\Sigma_0$ has a higher variance for the color intensity, $x_2$ than $\Sigma_1$. 
+
 
 ###Task d)
-When comparing 
+Sensitivity for Logistic, KNN with $k=3$ and LDA:
+```{r,echo=TRUE}
+sens_log
+sens_3
+sens_LDA
+```
+Specificity for Logistic, KNN with $k=3$ and LDA:
+```{r, echo=TRUE}
+spec_log
+spec_3
+spec_LDA
 
+```
 
-Explain what an ROC curve is. 
+When comparing the three methods based on cut-off with 0.5, we see that [method ] has the highest sensitivity and specificity. Based on this, we prefer to use [method]  . 
+An ROC curve compares the sensitivity and specificity up against each other. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical to evalute which classification method is the best when comparing sensitivity and specificity. 
 ```{r, eval=FALSE}
 library(pROC)
 #glmroc=roc(response=test$y,predictor=predglm)
 #plot(glmroc)
 #auc(glmroc)
+
+#Logistic
+#LOGroc=roc(response=test$y,predictor=)
 
 #K=3
 KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
@@ -562,20 +593,12 @@ KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
 KNN3roc=roc(response=test$y,predictor=KNN3prob)
 KNN3roc
 
-plot(KNN3roc)
-auc(KNN3roc)
-points(spec_3,sens_3)
 
-#K=9
-
-KNN9 = knn(train = train[,-1], test = test[,-1], k = 9, cl = train$y, prob = F)
-KNN9probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 9, cl = train$y, prob = TRUE))$prob
-KNN9prob <- ifelse(KNN9 == "0", 1-KNN9probwinning, KNN9probwinning)
-KNN9roc=roc(response=test$y,predictor=KNN9prob) 
 plot(KNN3roc,col="green")
 lines(KNN9roc,col="red")
+auc(KNN3roc)
 auc(KNN9roc)
-points(spec_9,sens_9)
+
 
 # ltrain=lda(y~x1+x2,data=train)
 # lpred=predict(object = ltrain, newdata = test)$posterior[,1]
