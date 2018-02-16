@@ -18,7 +18,6 @@ output:
 =======
 ## Problem 3
 #a) Logistic Regression
->>>>>>> ede3a8d49db1541c04657577b1c25bceb377516e
 
 * By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear. 
 
