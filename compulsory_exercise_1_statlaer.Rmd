@@ -13,24 +13,29 @@ knitr::opts_chunk$set(message =FALSE)
 
 ##Problem 1
 ###Task a) Training and test MSE
-Figure 4 shows that the $M=1000$ estimated models are spread over a relatively large range when $K=1$.This spread shrinkes while K increases. With $K=10$ this spread is approximately halved. However, as the K-value increase, the mean of the M repetitions deviates more from the underlying function. Especially in around the endpoints of the x-values, the regression lines for high K-value becomes horisontal, which does not correspond to $f(x)=1+x^2+x^3$.
+In problem 1 we consider a regression problem where the true underlying curve is $$f(x)=-x + x^2 + x^3$$. 
 
-These observations can be explained by the variyng flexibility for different K-values. When the K-value is low, the flexibility is high, so the fitted model with $K=1$ vary a lot for different training data sets. On the other hand, a high K-values leads to low flexibility, which can lead to misleading fitted models in the sense that the estimated mean deviates from the true mean.
+The K nearest neighbour method is used to compute regression models. The aim of this problem is to compare different K values for this regression.
 
-In figure 5 the mean-squared errors for the training set is stricktly increasing. This is because for a lower K-value, the fitted model more precicely corresponds to the data points in the training set. However, this does not mean that the best model is with $K=1$, since some of the trends captured from the training data set might be due to randomness and not the actual trends in the underlying curve.
+Figure 2 shows that the $M=1000$ estimated models are spread over a relatively large range when $K=1$.This spread shrinkes while K increases. With $K=10$ this spread is approximately halved. However, as the K-value increases, the mean of the M repetitions deviates more from the underlying function. Especially around the endpoints of the x-values, the regression lines for high K-values becomes horisontal, which does not correspond to $f(x)=1+x^2+x^3$.
 
-To get an indication of which K-value is the best to choose, one has to compute the MSE-value for a test set of other data points than in the training set. For the test set the mean-qaured errors has a minimum value for K around 3 to 5 and increases for higher and lower values. This indicates that choosing a K-value from 3 to 5 would give the best model fit. 
+These observations can be explained by the variyng flexibility for different K-values. When the K-value is low, the flexibility is high, so the fitted model with $K=1$ vary a lot for different training data sets. On the other hand, a high K-value corresponds to low flexibility, which can resuat in misleading fitted models in the sense that the estimated mean deviates from the true mean.
+
+Figure 3 shows how the trainMSE and testMSE varies with K. The mean-squared errors for the training set is stricktly increasing for increasing K. This is because for a lower K-value, the fitted model more precicely corresponds to the data points in the training set. However, this does not mean that the best model is with $K=1$, since some of the trends captured from the training data set might be due to randomness and not the actual trends in the underlying curve.
+
+To get an indication of which K-value is the best to choose, one has to compute the MSE-value for a test set of other data points than in the training set. For the test set the mean-squared errors has a minimum value for K around 3 to 5 and increases for higher and lower values. This indicates that choosing a K-value from 3 to 5 would give the best model fit. 
 
 
 ###Task b)
-The variance for a given x-value is calculated from the spread of the predicted values from the M regression models. The bias is calculated from the drifference of the mean of the predicted values and the true response value. 
-
-When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
-
-The goal is to reduce the total error, which is
+The goal is to reduce the total error of the regression model, which is
 
 
 $$\text{E}[(Y - \hat{f}(x_0))^2]=\text{Var}(\varepsilon) +  \text{Var}[\hat{f}(x_0)]+[\text{Bias}(\hat{f}(x_0))]^2$$
+
+
+The variance for a given x-value is calculated as the sample variance of the predicted values from the M regression models. The bias is calculated from the drifference of the mean of the predicted values and the true response value. 
+
+When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
 
 In the figure the total error has minimum point around 3-5, which is in agreement with what we found in exercise a). 
 
