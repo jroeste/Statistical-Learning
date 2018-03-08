@@ -1,11 +1,10 @@
 ---
-title: "Statlaer compulsory 1"
-output: html_document
----
-
----
-title: "Compulsory_exercise_1_statlaer"
-output: html_document
+title: "Statistical_learning_1"
+output:
+  html_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -16,30 +15,41 @@ knitr::opts_chunk$set(message =FALSE)
 
 ##Problem 1
 ###Task a) Training and test MSE
-Figure 2 shows that the $M=1000$ estimated models are spread over a relatively large range when $K=1$.This spread shrinkes while K increases. With $K=10$ this spread is approximately halved. However, as the K-value increase, the mean of the M repetitions deviates more from the underlying function. Especially around the endpoints of the x-values, the regression lines for high K-values become horisontal, which does not correspond to $f(x)=1+x^2+x^3$.
+In problem 1 we consider a regression problem where the true underlying curve is $$f(x)=-x + x^2 + x^3$$. 
 
-These observations can be explained by the variyng flexibility for different K-values. When the K-value is low, the flexibility is high, so the fitted model with $K=1$ vary a lot for different training data sets. On the other hand, a high K-values leads to low flexibility, which can lead to misleading fitted models in the sense that the estimated mean deviates from the true mean.
+The K nearest neighbour method is used to compute regression models. The aim of this problem is to compare different K values for this regression.
 
-In figure 3 the mean-squared errors for the training set is stricktly increasing. This is because for a lower K-value, the fitted model more precicely corresponds to the data points in the training set. However, this does not mean that the best model is with $K=1$, since some of the trends captured from the training data set might be due to randomness and not the actual trends in the underlying curve.
+Figure 2 shows that the $M=1000$ estimated models are spread over a relatively large range when $K=1$.This spread shrinkes while K increases. With $K=10$ this spread is approximately halved. However, as the K-value increases, the mean of the M repetitions deviates more from the underlying function. Especially around the endpoints of the x-values, the regression lines for high K-values become horisontal, which does not correspond to $f(x)=1+x^2+x^3$.
 
-To get an indication of which K-value is the best to choose, one has to compute the MSE-value for a test set of other data points than in the training set. For the test set the mean-sqaured errors has a minimum value for K around 3 to 5 and increases for higher and lower values. This indicates that choosing a K-value from 3 to 5 would give the best model fit. 
+These observations can be explained by the variyng flexibility for different K-values. When the K-value is low, the flexibility is high, so the fitted model with $K=1$ vary a lot for different training data sets. On the other hand, a high K-value corresponds to low flexibility, which can resuat in misleading fitted models in the sense that the estimated mean deviates from the true mean.
 
+Figure 3 shows how the trainMSE and testMSE varies with K. The mean-squared errors for the training set is stricktly increasing for increasing K. This is because for a lower K-value, the fitted model more precicely corresponds to the data points in the training set. However, this does not mean that the best model is with $K=1$, since some of the trends captured from the training data set might be due to randomness and not the actual trends in the underlying curve.
+
+To get an indication of which K-value is the best to choose, one has to compute the MSE-value for a test set of other data points than in the training set. For the test set the mean-squared errors has a minimum value for K around $K=3$ to $K=5$ and increases for higher and lower values. This indicates that choosing a K-value from 3 to 5 would give the best model fit. 
 
 
 ###Task b)
-The variance for a given x-value is calculated from the spread of the predicted values from the M regression models. The bias is calculated from the difference of the mean of the predicted values and the true response value. 
-
-When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
-
-The goal is to reduce the total error, which is
+The goal is to reduce the total error of the regression model, which is
 
 
 $$\text{E}[(Y - \hat{f}(x_0))^2]=\text{Var}(\varepsilon) +  \text{Var}[\hat{f}(x_0)]+[\text{Bias}(\hat{f}(x_0))]^2$$
 
-In the figure the total error has minimum point around $k=3$ to$k=5$, which is in agreement with what we found in exercise a). 
+
+Variance can be interpreted as the spred of the fitted models, and bias as difference of the expected value of the estimated function and the true function. Matematically this is:
+
+$$Bias = E[\hat{f}(x)-f(x)]$$
+
+$$Variance = E[\hat{f}(x)^2]-E[\hat{f}(x)]^2$$
+
+The expected values of the estimated function is calculated as the average of the M repetitions.
+
+When the value of K decreases the model gets more flexible, and hence the squared bias decreases. On the other hand the variance increases when the K value decreases. The irreducible error is constant, and is independent of K. 
+
+In the figure the total error has minimum point around $k=3$ to $k=5$, which is in agreement with what we found in exercise a). 
 
 ##Problem 2
 ###Task a)
+In problem 2 we study a data set from Fermingham heart study. We want to model systolic blood pressure based on seven variables. 
 
 Equation for fitted model: 
 
@@ -51,20 +61,21 @@ Explanation of the summary-output:
 
 `Std.Error`: Gives the square root of the estimated variance.
 
-`t value`: Number of standard deviations that the estimator is away from $\beta$ in the null hypothesis , $$t = \frac{\hat\beta - \beta}{SE(\hat\beta)}$$.
+`t value`: The t statistic is used to test a hypothesis. In this case we consider the following null hypothesis:
 
-`Pr(>|t|)`: Measure of p-value for the hypothesis with the following null hypothesis:
 
-$$H_0: \beta_i = 0 \textrm{, there is no actual relationship between the parameter and the response}$$
 
-The number $Pr(>|t|)$ represents the probability of observing data resulting in an estimated $\beta$-value with absolute value equal to or larger than the one estimated for this data set, given that the null hypothesis is true. 
+$$H_0: \beta = 0 \textrm{, there is no actual relationship between the parameter and the response}$$
+The t value is number of standard deviations that the estimated $\beta$ is away from the null hypothesis $$t = \frac{\hat\beta - \beta}{SE(\hat\beta)}$$. 
+
+`Pr(>|t|)`: Measure of p-value for the hypothesis test. The number Pr(>|t|) represents the probability of observing data resulting in an estimated $\beta$-value with absolute value equal to or larger than the one estimated for this data set, given that the null hypothesis is true. 
 
 `Residual standard error`:
 
 Estimate of the standard deviation of the error $\epsilon$. It is computed as
 
 $$RSE = \sqrt{RSS/(n-p-2)}$$
-where n is the number of observations, p is the number of distinct predictors and $RSS=\sum_{n}^{i=1}(y_i - \hat y_i)^2$.
+where n is the number of observations, p is the number of distinct predictors and $RSS=\sum_{i=1}^{n}(y_i - \hat y_i)^2$
 
 `F-statistic`:
 
@@ -72,16 +83,20 @@ Formula:
 
 $$F = \frac{(TSS-RSS)/p}{RSS/(n-p-1)}$$
 
+TSS is the total sum of squares, which equals $\sum_{}^{}(y_i - \bar y)^2$.
+
 The value of the F-statistic is a result of performing the hypothesis test with null hypothesis:
 
 $$H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$$
+
 If the null hypothesis is correct, the F-statistic has expected value 1. If at least one of the parameters has real value above zero, the expected value of F is greater than 1. The F-statistic can thus be used to compare models. A model with higher F-statistic catches the correlations in the population better. 
 
 ###Task b)
+We fit a regression model to the data set with -1/sqrt(SYSBP) as response, where SYSBP is the systolic blood pressure. 
 
-The proportion of variability explained by this model is 0.2494, given by the $R^2$-value. This means that about one fourth of the variability in the `-1/SYSBP data` is explained by `sex`, `age`, `current smoking`, `BMI` , `total cholesterol` and `anti-hypersensitive medication`. Thus, about three fourths of the variability comes from other things that we haven't measured.
-The figure below shows a plot of the residuals vs the fitted values.
+The proportion of variability explained by this model is 0.2494, given by the $R^2$-value. This means that about one forth of the variability in the `-1/sqrt(SYSBP)` data is explained by `sex`, `age`, `current smoking`, `BMI`, `total cholesterol` and `anti-hypersensitive medication`. Thus, about three forths of the variability comes from other things that we haven't measured.
 
+The figure below shows a plot of the residuals vs the fitted values. 
 ```{r echo = FALSE}
 library(ggplot2)
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
@@ -96,7 +111,7 @@ ggplot(modelA, aes(.fitted, .resid)) + geom_point(pch = 21) +
 
 ```
 
-The figure shows that most of the residuals lie between 0.015 and -0.015. The red line represents the average residual value at each fitted value. This shows that the residuals are mostly centered around zero. Ideally the residuals should be symmetrically distributed, and not show any patterns with the size of the fitted values. For large fitted values the average seems to decrease. However this could be due to randomness since there are few measured values of that size. Thus, it seems like the residuals are relatively independent of the fitted values. 
+The figure shows that most of the residuals lie between 0.015 and -0.015. The red line represents the average residual value at each fitted value. This shows that the residuals are mostly sentered around zero. Ideally the residuals should be small, symetrically distributed, and not show any patterns with the size of the fitted values. For large fitted values the average seems to decrease. However this could be due to randomness since there are few measured values of that size. Thus, it seems like the residuals are relatively independent of the fitted values. 
 
 The next figure is a Q-Q-plot of the standarized residuals.
 
@@ -111,19 +126,28 @@ ggplot(modelA, aes(sample = .stdresid)) +
 
 ```
 
-Here the residuals follows a straight line. This means that the residuals are normally distributed. 
+Here the residuals follows a straight line. This means that the residuals are normally distributed.
 
-Over all it seems like the linear regression model works well for the data. However, due to a relatively low $R^2$-value, there are probably many unknown factors influencing the blood pressure. 
+ 
 
-The Anderson-Darling normality test for this model gives a p-value of 0.8959. 
+```{r, echo = FALSE}
+# normality test
+library(nortest) 
+ad.test(rstudent(modelA))
+```
 
-Now we want to compare this model to a similar linear regression model with respones variable SYSBP rather than -1/SYSBP. An advantage of using SYSBP directly as response, is that the regression model will be somewhat easier to interpret.
+The Anderson-Darling normality test for this model gives a p-value of 0.8959, which is in agreement with the assumption that the residuals come froma normal distribution. 
+
+Over all it seems likely that the residuals come from a normal distribution, which indicates that the linear regression model works well for the data. However, due to a relatively low $R^2$-value, there are probably many unknown factors influencing the blood pressure. 
+
+Now we want to compare this model to a similar linear regression model with respones variable SYSBP rather than -1/sqrt(SYSBP). An advantage of using SYSBP directly as response, is that the regression model will be somewhat easier to interpret.
 
 The following is a "fitted values vs residuals"-plot, a Q-Q-plot and the Anderson-Darling normality test for this model. 
 
 
 
 ```{r echo=FALSE}
+
 library(ggplot2)
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
 modelB=lm(SYSBP ~ .,data = data)
@@ -143,16 +167,18 @@ ggplot(modelB, aes(sample = .stdresid)) +
 # normality test
 library(nortest) 
 ad.test(rstudent(modelB))
+
 ```
 
 The "fitted values vs residuals"-plot for this is quite similar to that of the previous model. 
 
-In the Q-Q-plot, more of the points deviate from the straight line. Also, the p-value of the normality test is lower than in the previous model. Hence, the residuals in this model is less likely to come from a normal distribution, indicating that linear regression is not as suitable with SYSBP as response. 
+In this Q-Q-plot more of the points deviate from the straight line. Also, the p-value of the normality test for this moedl is very low. Hence, the residuals in this model is less likely to come from a normal distribution, indicating that linear regression is not as suitable with SYSBP as response. 
 
-Over all it seems like the response variable -1/SYSBP has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
+Over all it seems like the response variable -1/sqrt(SYSBP) has a more linear correlation with the input parameters than SYSBP. Therefore we would perfer to use the first regression model.
+
 
 ###Task c)
-In this task, `modelA` is used to analyse the connection between $BMI$ and the response,$ -1/sqrt(SYSBP)$. Below, the summary output from the linear regression in R is shown.
+In this task, `modelA` is used to analyse the connection between $BMI$ and the response. Below, the summary output from the linear regression in R is shown.
 ```{r, echo=FALSE}
 
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
@@ -162,48 +188,60 @@ summary(modelA)
 
 ```
 
-The estimated numerical value of $\hat\beta_{BMI}$ can be read out of the summary: $\hat\beta_{BMI}=3.087 \cdot 10^{-4}$.
+The estimated coefficients can be expressed as $\boldsymbol{\hat\beta}=(\mathbf{X^TX})^{-1}\mathbf{X}^T\mathbf{Y}$, where $\mathbf{X}$ is the design matrix containing all of our data, and $\mathbf{Y}$ is the response variable in our model; $\mathbf{Y}=\mathbf{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}$. The numerical value of $\hat\beta_{BMI}$ can be read out of the summary: $\hat\beta_{BMI}\approx 3.087 \cdot 10^{-4}$.
 
-The estimated coefficients can be interpreted as a measure of how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the change in the predicted response is $3.087\cdot10^{-4}$.
+The estimated coefficients can be iterpreted as a measure on how much each covariate affects the predicted response. In particular, $\hat\beta_{BMI}$ can be interpreted as the average effect on the response as a consequence of a unit change of the $BMI$-covariate. Comparing it to the other estimated coefficients, it seems like for `modelA`, the $BMI$ covariate has a significant impact on the response. This means that if you keep the other covariates constant and increase the $BMI$ covariate with one unit, the changes in the predicted response is $3.087\cdot10^{-4}$.
 
-99% confidence interval for  $\beta_{BMI}$ is the interval where we are 99% confident to find $\beta_{BMI}$, given our data set. This can be found using the standard error from the fitted model, $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\bar x)}=(2.955 \cdot 10^{-5})^2$. The confidence interval is given by
+99% confidence interval for  $\beta_{BMI}$ is the interval we are $99$% confident to find $\beta_{BMI}$. It can be proven that $\boldsymbol{\hat\beta}$ ~ $N(\boldsymbol\beta,\sigma^2(\mathbf{X^TX})^{-1})$.The $(1-\alpha)100$% confidence interval can then be constructed.
 
 $$
-\hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI}),
+P(-t_{\alpha/2,n-2} \leq\frac{\hat\beta-\beta}{\sqrt{c_{jj}\hat\sigma^2}} \leq t_{\alpha/2,n-2}) = 1-\alpha \\ 
+P(\hat\beta_{BMI}-t_{0.005,n-2}\sqrt{c_{jj}\hat\sigma^2} \leq \beta \leq \hat\beta_{BMI}-t_{0.005,n-2}\sqrt{\hat\sigma^2c_{jj}})=1-\alpha
 $$
-where the t-distribuition can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.01$, so 
+Here, the $c_{jj}$ is the diagonal element of $\mathbf{(X^TX)^{-1}}$ corresponding to $\hat\beta_{BMI}$, and $\alpha=0.1$
+
+The values needed to compute the estimate of the variance can be found using the output from the fitted model in R. We are interested in the standard error for $\beta_{BMI}$ which gives us the square root of the estimated variance. In our case,  $SE(\hat\beta_{BMI})^2=\frac{\sigma^2}{\sum_{i=1}^{n}}(x_i-\bar x)=2.955 \cdot 10^{-5}$. The confidence interval is given by
+
+$$
+\hat\beta_{BMI}\pm t_{\alpha/2,n-2}\cdot SE(\hat\beta_{BMI})
+$$
+where the t-distribution can be approximated by the normal distribution because $n$ is large. In this case, $\alpha=0.01$, so 
 $$
 \hat\beta_{BMI}\pm z_{\alpha/2}\cdot SE(\hat\beta_{BMI}),
 $$
 where $z_{\alpha/2}=z_{0.01/2}=2.576$, so the confidence interval is
 
 $$
-[3.087 \cdot 10^{-4} - 2.576 \cdot (2.955 \cdot 10^{-5}), 3.087 \cdot 10^{-4} + 2.576 \cdot (2.955 \cdot 10^{-5})] \\ 
-= [2.326 \cdot 10^{-4}, 3.848 \cdot10^{-4}].\\
+[3.087 \cdot 10^{-4} - 2.576 \cdot (2.955 \cdot 10^{-5}), 3.087 \cdot 10^{-4} + 2.576 \cdot (2.955 \cdot 10^{-5})]= \\ 
+[2.326 \cdot 10^{-4}, 3.848 \cdot10^{-4}].
 $$
 This can also be confirmed by the built-in function `confint()` in R:
 
 ```{r echo=FALSE}
 int=confint(modelA,level = 0.99)
 int[5,]
+
 ```
 
-When interpreting the confidence interval, it can be useful to consider the accuracy of our estimation, for example the standard error of the parameter. In this case, $SE(\hat\beta_{BMI})=2.955 \cdot 10^{-5}$. This is a factor $10$ smaller than the estimated parameter itself. With this in mind, it is quite safe to assume that $\beta_{BMI}$ is far enough from zero to conclude that according to `modelA`, there is in fact a connection between the BMI and the response. 
+When interpreting the confidence interval, it can be useful to consider the accuracy of our estimation, for example the standard error of the parameter. In this case, $SE(\hat\beta_{BMI})=(2.955 \cdot 10^{-5})$. This is a factor $10$ smaller than the estimated parameter itself. With this in mind, it is quite safe to assume that $\beta_{BMI}$ is far enough from zero to conclude that according to `modelA`, there is in fact a connection between the BMI and the response. 
 
-Can we know anything about the p-value for a hypothesis test? In fact, the null hypothesis $H_0: \beta_{BMI}=0$ says that "there is no relationship between $\beta_{BMI}$ and $-1/\sqrt{SYSBP}$".
- - We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero, i.e. we are 99 % confident that there in fact is a relationship. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI}$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01, which corresponds to the p-value from the summary.
+Can we know anything about the p-value for a hypothesis test? In words, the null hypothesis $H_0: \beta_{BMI}=0$ is saying that "there is no relationship between $\beta_{BMI}$ and $-1/\sqrt{SYSBP}$".
+We are 99 % confident that our $\beta_{BMI}$ lies in an interval not containg zero, i.e. we are 99 % confident that there in fact is a relationship. The p-value is, assuming the zero-hypothesis is true, the probability of not observing a linear connection between the response and $\beta_{BMI}$. Since the confidence interval calculated above says that we are quite confident that our zero-hypothesis should be rejected (there is a connection between $Y$ and $\beta_{BMI}$), we would expect the p-value to be small. More exact, one can assume that the p-value will be smaller than 0.01. This is also confirmed by the R-code above, where the p-value is calculated to be less than $2\cdot10^{-16}$.
  
 ###Task d)
+ 
 Now, we are considering a new observation, namely 
-
 ```{r, echo=FALSE}
+
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
+
 modelA=lm(-1/sqrt(SYSBP) ~ .,data = data)
 new=data.frame(SEX=1,AGE=56,CURSMOKE=1,BMI=89/1.75^2,TOTCHOL=200,BPMEDS=0)
 new=cbind(1,new)
 new
 ```
-Using `modelA`, one obtain the value $-0.0867$ for his $-1/\sqrt{SYSBP}$ and $133$ for his $SYSBP$, when inverting. The code output is shown below.
+
+Using `modelA`, one obtain the value $0.0867$ for his $1/\sqrt{SYSBP}$ and $133$ for his $SYSBP$. The code output is shown below.
 
 ```{r, echo=FALSE}
 Y=coef(modelA)%*%t(new)
@@ -211,9 +249,18 @@ Y
 bp=(1/(-Y)^2)
 bp
 ```
+We want to construct a 90% prediction interval for our prediction, and name the prediction for the response $\mathbf{\hat{Y}}=\mathbf{x_0^T}\boldsymbol{\beta}$. The expression for the prediction interval for $\mathbf{Y}$:
 
-Construct a 90% prediction interval for the new observation: 
-
+$$
+P( \mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}} \leq \mathbf{Y_0} \leq\mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}} ) = 1-\alpha \\ 
+$$
+Where $\mathbf{x_0}$ is the covariates measured, $p$ is the number of covariates.
+So a prediction interval for our response can be expressed as
+$$
+[\mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}}, \mathbf{x_0^T}\boldsymbol{\hat\beta} - t_{\alpha/2,n-p-1} \hat\sigma^2 \sqrt{1+\mathbf{x_0^T}\mathbf{(X^TX)^{-1}\mathbf{x_0}}}]
+$$
+The R-function ´predict()´ gives the $90$% rpediction interval
+We construct a 90% prediction interval for the new observation: 
 ```{r, echo=FALSE}
 data = read.table("https://www.math.ntnu.no/emner/TMA4268/2018v/data/SYSBPreg3uid.txt")
 
@@ -225,7 +272,7 @@ predict(modelA,new,interval='predict',level=0.90)
 Transformed to `SYSBP`, we get the prediction interval
 $[107.9, 168.28]$.
 
-The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear.  
+The prediction interval tells us that we are 90 % confident that the true `SYSBP` will lie in the interval. The interval is not very accurate, and thus not very informative as most peoples `SYSBP` will in fact lie in this interval. In addition, when calculating the prediction interval for the $-1/\sqrt{SYSBP}$ prior to the transformation to `SYSBP`, one will not obtain the correct 90% prediction interval for the `SYSBP`, because the realtionship between the two is not linear. This is also easily observed, as our `SYSBP` prediction is not the centre of the `SYSBP` 90% PI.
 
 ##Problem 3
 ###Task a) Logistic Regression
@@ -233,7 +280,7 @@ The prediction interval tells us that we are 90 % confident that the true `SYSBP
 By standard algebraic rules for the logarithm one can show that logit$(p_i)$ is linear.
 
 $$
-\text{logit}(p_i)=\log ( \frac{p_i}{1-p_i})=\log(p_i)-\log(1-p_i)
+\text{logit}(p_i)=\log ( \frac{p_i}{1-p_i})=\log(p_i)-\log(1-p_i) \\
 =
 \log(\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}})-\log(1-\frac{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2}}}{ 1+ e^{\beta_0 + \beta_1x_{i1} + \beta_2x_{i2}}}) \\
 =
@@ -259,7 +306,7 @@ colnames(wine)=c("y","x1","x2")
 
 ```{r, echo=FALSE}
 n=dim(wine)[1]
-set.seed(1828) #to get the same order if you rerun - but you change this to your favorite number
+set.seed(4268) #to get the same order if you rerun - but you change this to your favorite number
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
@@ -269,8 +316,8 @@ summary(glm.fits)
 ```
 
 A logistic regression model was fitted using the glm-function in R. In our case, the following values was found for the regression coefficients:
-SEED!!
-$\hat\beta_0\approx 0.4909$ and $\hat\beta_1\approx 0.4109$ and $\hat\beta2\approx -1.8828$. 
+
+$\hat\beta_0 =7.3143$ and $\hat\beta_1 = 0.1332$ and $\hat\beta2 = -2.3361$. 
 
 
 In the logistic regression setting, it can be more useful to consider the odds, $p_i/(1-p_i)$, rather than the probability $p_i$ as $p_i$ is an exponential function. In our case, $p_i$ is the conditional probability that a wine is in class 1, given color and alcalinity. 1 - $p_i$ is the conditional probability that the wine is in class 0.
@@ -301,15 +348,15 @@ a=(-b0)/b2
 ggplot(train,mapping=aes(x=x1,y=x2,color=y))+ggtitle('Training observations')+geom_point() + geom_abline(slope=b, intercept=a)
 ```
 The sensitivity and specificity is given by the following formulaes:
-$$Spec=\frac{\text{Correctly predicted no. in class 0}}{\text{Actual no. of wines in class 0}}$$
-$$Sens=\frac{\text{Correctly predicted no. in class 1}}{\text{Actual no. of wines in class 1}}$$
+$$\text{Spec}=\frac{\text{Correctly predicted no. in class 0}}{\text{Actual no. of wines in class 0}}$$
+$$\text{Sens}=\frac{\text{Correctly predicted no. in class 1}}{\text{Actual no. of wines in class 1}}$$
 
 
 
 ```{r,echo=FALSE}
 #Confusion table
 probs_wine1<- predict(glm.fits, test,type="response") 
-#summary(probs_wine1)
+summary(probs_wine1)
 pred_wine1<-rep("0",65)
 pred_wine1[probs_wine1>0.5]="1"
 t_log=table(pred_wine1,(test$y))
@@ -323,15 +370,14 @@ p_i
 #compute predicted probabilities
 predictions_wine1=data.frame(probs_wine1,pred_wine1,test[,1])
 colnames(predictions_wine1)=c("Estimated prob","Predicted class","True class")
+predictions_wine1[1]
 sens_log=t_log[2,2]/(t_log[1,2]+t_log[2,2])
 spec_log=t_log[1,1]/(t_log[1,1]+t_log[2,1])
 sens_log
 spec_log
 ```
-SEED!
 The probability of being in class 1, given $x_1=17$ and $x_2=3$ is 0.929. Thus it is quite likely that this observation is in class 1. 
 From the confusion table and the sensitivity and specificity, we see that classifier does not classify all the test observations correctly.
-
 
 ###Task b) K-nearest neighbor classifier 
 
@@ -341,7 +387,8 @@ $$
 P(Y=1|X=x_0) = \frac{1}{K}\sum_{i\in \mathcal{N_0}}I(y_i=1).
 $$
 
-gives the probability that a test observation with predictor values $x_0$ has response value $Y=1$. This probability is given as the proportion of the K nearest points in the training data that are in class 1. The equation includes an indicator function $I(y_i = 1)$, which equals 1 if $y_i = 1$ and 0 if $y_i \neq 1$. In this way it sums up the number of neighboors that are in class 1. 
+gives the probability that a test observation with predictor values $\textbf{x_0}$ has response value $Y=1$. This probability is given as the proportion of the K nearest points in the training data that are in class 1. The equation includes an indicator function $I(y_i = 1)$, which equals 1 if $y_i = 1$ and 0 if $y_i \neq 1$. Taking the sum over the neighbours, indicator function counts the neighbours in class.
+
 
 K-nearest neighboor is used to classify the wines in the test set. The confusion table, sensitivity and specificity for KNN with $K=3$ are given below:
 
@@ -372,7 +419,7 @@ spec_3 = tknn3[1,1]/(tknn3[1,1]+tknn3[2,1])
 spec_3
 
 ```
-These results show that the classifier is not able to classify all test observations correctly. However, considering the overlap of the two classes in the plot, there is some irreducible error present. Thus, the classifier might do well.  
+These results show that the classifier is not able to classify all test observations correctly. However, considering the overlap of the two classes seen in the plot in the exercise text, there is some irreducible error present. Thus, the classifier might do well.  
 
 
 With $K=9$ we got the following results:
@@ -399,6 +446,11 @@ spec_9
 
 ```
 
+For K=9 the sensitivity is lower that for K=3, indicating that the classifier with K=3 is better. However, the data set is not so large, so this difference is due to a few single wines. This means that we cannot be certain of which of the K-values that are best. 
+
+Because of the bias-variance trade-off we don't choose the K-value as low or high as possible. A low K can give a high variance, and a high K can give a high bias.  
+
+
 ###Task c) LDA (& QDA)
 
 $\pi_k=Pr(Y=k)$ is the prior probability, which in this case gives the probability of being in class 1 or 2. $\mu_k$ is the mean for the two wine classes, and $f_k({\bf x})$ is the probability density function, given a class. $\boldsymbol{\Sigma}$ is the covariate matrix.
@@ -423,7 +475,7 @@ Sigma_0=var(train[train$y==0,2:3])
 Sigma_1=var(train[train$y==1,2:3])
 Sigma=(n0-1)*Sigma_0/(n0+n1-2)+(n1-1)*Sigma_1/(n0+n1-2)
 ```
-The estimates for $p_i$, $\mu_0$, $\mu_1$ and \$Sigma$ are given here:
+The estimates for $p_i$, $\mu_0$, $\mu_1$ and $\Sigma$ are given here:
 ```{r,,echo=FALSE,eval=TRUE}
 pi
 
@@ -482,15 +534,21 @@ Solving this equation with the estimates for $\boldsymbol{\mu}$ and $\boldsymbol
 
 
 ```{r,echo=FALSE}
-right_side=0.5*t(mu_1)%*%solve(Sigma)%*%mu_1-0.5*t(mu_0)%*%solve(Sigma)%*%mu_0-log(pi[2]/pi[1])
+right_side<-0.5*t(mu_1)%*%solve(Sigma)%*%mu_1-0.5*t(mu_0)%*%solve(Sigma)%*%mu_0-log(pi[2]/pi[1])
 left_side=solve(Sigma)%*%(mu_1-mu_0)
 const_1=left_side[1]
 const_2=left_side[2]
 train_intercept=right_side/const_2
 train_slope=-const_1/const_2
+right_side
+train_intercept
+train_slope
+const_1
+const_2
+
 ```
-SEED!
-This gives the following equation for the boundary line: $0.164x_1-2.628x_2=-8.368 \rightarrow x_2=3.184+0.063x_1$.
+
+This gives the following equation for the boundary line: $0.215x_1-2.410x_2=-6.062 \rightarrow x_2=2.514+0.089x_1$.
 
 ```{r,echo=FALSE}
 library(MASS)
@@ -507,7 +565,7 @@ lda.train_pred=predict(lda.train,newdata=test)
 
 
 ```
-
+The green curve intercepts at $x2(10)\approx 3.5$, where $x=10$. 
 ```{r,echo=FALSE}
 #Creating confusion table
 library(knitr)
@@ -533,20 +591,20 @@ spec_LDA=conf_table[1,1]/sum(conf_table[1,])
 
 Sensitivity:
 ```{r,echo=FALSE}
-print(sens_LDA)
+sens_LDA
 ```
 
 Specificity:
 ```{r,echo=FALSE}
-print(spec_LDA)
+spec_LDA
 ```
+Fraction of good predictions and test-error:
 ```{r,echo=FALSE}
-print(ratio)
-print(test_error)
+ratio_LDA
+test_error_LDA
 ```
-SEED
-The sensitivity is 0.833, and the specificity is 0.828. This looks quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 
+The sensitivity is 0.833, and the specificity is 0.828. This looks quite good, the fraction of correct predictions is 0.831, wih a testerror of 0.17.
 
 The most important difference between the LDA and the QDA philosophy is that the covariance matrices for the classes are assumed equal for LDA and non-equal for QDA. When assuming non-equal matrices for QDA, the discriminant equation for finding the boundary line will change. It will not be possible to subtract ${\bf x}^T\boldsymbol{\Sigma}^{-1}{\bf x}$ from each side, since on left side we have $\boldsymbol{\Sigma_0}^{-1}$ and $\boldsymbol{\Sigma_1}^{-1}$ on right side. This results in a quadratic relation of the $\bf{x}$'es for the equation, and the boundary line will have a quadratic form. 
 
@@ -557,7 +615,7 @@ Sigma_0
 Sigma_1
 Sigma
 ```
-These estimates for $\Sigma_0$ and $\Sigma_1$ are not equal each other, but when changing the seed, the covariate matrices changes a lot. It is then not enough to evaluate whether or not they really are equal enough. Performing cross validation, i.e. changing the divison of training data and test data many times would give a more certain result. However, it looks like the trend is that $\Sigma_1$ has a higher variance for the alcalinity of ash, $x_1$ than $\Sigma_0$ has. Also, $\Sigma_0$ has a higher variance for the color intensity, $x_2$ than $\Sigma_1$. 
+These estimates for $\Sigma_0$ and $\Sigma_1$ are not equal each other, but when changing the seed, the covariate matrices changes a lot. It is then not enough to evaluate whether or not they really are equal enough. Performing cross validation, i.e. changing the divison of training data and test data many times would give a more certain result. However, it looks like the trend is that $\Sigma_1$ has a higher variance for the alcalinity of ash, $x_1$ than $\Sigma_0$ has. Also, $\Sigma_0$ has a higher variance for the color intensity, $x_2$, than $\Sigma_1$. 
 
 
 ###Task d)
@@ -572,39 +630,32 @@ Specificity for Logistic, KNN with $k=3$ and LDA:
 spec_log
 spec_3
 spec_LDA
-
 ```
-
 When comparing the three methods based on cut-off with 0.5, we see that [method ] has the highest sensitivity and specificity. Based on this, we prefer to use [method]  . 
-An ROC curve compares the sensitivity and specificity up against each other. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical to evalute which classification method is the best when comparing sensitivity and specificity. 
-```{r, eval=FALSE}
+An ROC curve compares the sensitivity and specificity up against each other for all values of the cut off. A specificity equal 1 will give sensitivity equal 0, and the other way around. It is useful to have because it gives a graphical method to evalute which classification method is the best when comparing sensitivity and specificity. 
+
+```{r, echo=FALSE}
 library(pROC)
-#glmroc=roc(response=test$y,predictor=predglm)
-#plot(glmroc)
-#auc(glmroc)
 
 #Logistic
-#LOGroc=roc(response=test$y,predictor=)
+LOGroc=roc(response=test$y,predictor=probs_wine1)
 
 #K=3
 KNN3 = knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = F)
 KNN3probwinning = attributes(knn(train = train[,-1], test = test[,-1], k = 3, cl = train$y, prob = TRUE))$prob
 KNN3prob <- ifelse(KNN3 == "0", 1-KNN3probwinning, KNN3probwinning)
 KNN3roc=roc(response=test$y,predictor=KNN3prob)
-KNN3roc
 
-
-plot(KNN3roc,col="green")
-lines(KNN9roc,col="red")
-auc(KNN3roc)
-auc(KNN9roc)
-
-
-# ltrain=lda(y~x1+x2,data=train)
-# lpred=predict(object = ltrain, newdata = test)$posterior[,1]
-# lroc=roc(response=test$y,lpred)
-# plot(lroc)
-# auc(lroc)
+#LDA
+LDAroc=roc(response=test$y,predictor=lda.train_pred$posterior[,2])
 ```
 
-
+```{r,echo=TRUE}
+plot(LOGroc,col="green")
+lines(KNN3roc,col="red")
+lines(LDAroc,col="blue")
+auc(LOGroc)
+auc(KNN3roc)
+auc(LDAroc)
+```
+We see here that KNN with $k=3$ is best in the cut-off 0.5. For other cut-offs, LDA and Logistic regression are the best. When comparing auc-values, LDA has the highest value.
