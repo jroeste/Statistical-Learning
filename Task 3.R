@@ -17,7 +17,7 @@ train = wine[ord[((n/2)+1):n],]
 
 head(train)
 
-
+?predict()
 #fit a model on the training data
 glm.fits<-glm(y~x1+x2, family = binomial,data=train)
 summary(glm.fits)
