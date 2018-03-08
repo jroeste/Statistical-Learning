@@ -259,7 +259,7 @@ colnames(wine)=c("y","x1","x2")
 
 ```{r, echo=FALSE}
 n=dim(wine)[1]
-set.seed(1828) #to get the same order if you rerun - but you change this to your favorite number
+set.seed(4029) #to get the same order if you rerun - but you change this to your favorite number
 ord = sample(1:n) #shuffle 
 test = wine[ord[1:(n/2)],]
 train = wine[ord[((n/2)+1):n],]
@@ -599,6 +599,11 @@ LDAroc=roc(response=test$y,predictor=lda.train_pred$posterior[,2])
 plot(LOGroc,col="green")
 lines(KNN3roc,col="red")
 lines(LDAroc,col="blue")
+points(spec_3,sens_3)
+points(spec_LDA,sens_LDA)
+points(spec_log,sens_log)
+
+
 auc(LOGroc)
 auc(KNN3roc)
 auc(LDAroc)
