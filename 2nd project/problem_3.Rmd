@@ -1,0 +1,58 @@
+---
+subtitle: "TMA4268 Statistical Learning V2018"
+title: "Compulsory exercise 2: Problem 3"
+author: "NN1, NN2 and NN3"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: #3rd letter intentation hierarchy - uncomment html_document and comment pdf_document if neede
+  # html_document
+  pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+
+##3a)
+
+* Q19: Fitting the specified `gam`
+
+```{r,echo=TRUE, eval=TRUE}
+library(gam)
+library(ISLR)
+library(GGally)
+library(leaps)
+library(glmnet)
+library(ggplot2)
+
+library(ISLR)
+ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
+                   "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
+                   "weight"=Auto$weight,"acceleration"=Auto$acceleration, 
+                   "year"=Auto$year,"origin"=as.factor(Auto$origin))
+colnames(ourAuto)
+ntot=dim(ourAuto)[1]
+set.seed(4268)
+testids=sort(sample(1:ntot,ceiling(0.2*ntot),replace=FALSE))
+ourAutoTrain=ourAuto[-testids,]
+ourAutoTest=ourAuto[testids,]
+###i den endelige innleveringsfilen trenger vi bare kodesnutten herfra og ned###
+
+library(plyr)
+ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
+                              to = c('Am','Eu','Jap'))
+gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
+                   weight+s(acceleration, 3)+factor(origin),data=ourAutoTrain)
+
+par(mfrow=c(2,3))
+plot(gamobject,se=TRUE,col="blue")
+minDisplace=min(ourAutoTrain$displace)
+maxDisplace=max(ourAutoTrain$displace)
+```
+The resulting plots shows the fitted GAM with five components, in addition to pointwise standard errors. The first component $f_1$ is a cubic spline in `displace` with one knot at 290. The curve indicates that 
+
+* Q20: A basis for the cubic spline in `displace`: We have one knot $c_1=290$, in addition to the two boundary knots which come from the extreme values of `displace`, which is $c_0=68$ and $c_2=455$ and can easily be found from the training set using the min- and max-function in R like shown in the code above. We will have two basis functions, which takes the form
+
+$$
+y_i=\beta_0 + 
+$$
