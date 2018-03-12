@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 ##2a) Explain figures
 
 * Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
