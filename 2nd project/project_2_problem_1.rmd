@@ -1,25 +1,18 @@
 ---
-subtitle: "TMA4268 Statistical Learning V2018 - problem 3"
-title: "Compulsory exercise 2: Group XX"
-author: "NN1, NN2 and NN3"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: #3rd letter intentation hierarchy - uncomment html_document and comment pdf_document if neede
-  # html_document
-  pdf_document
-editor_options: 
-  chunk_output_type: console
+title: "Untitled"
+output: pdf_document
 ---
-  
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 ```
+
+
 ##1a)
   
 * Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
 
-<!--This comes from that we first have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
-$$\sum_{k=0}^{d} \binom{d}{k} = ... = 2^d.$$
-Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. -->
+
 
 * Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
 1. For $k=0,1,2,...,d$: \newline
@@ -72,7 +65,7 @@ MSE_train=mean((ourAutofit.lm$residuals)^2)
 #ad.test(rstudent(ourAutofit.lm))
 ```
 
-As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10⁻3$ and $10¹$. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight`and `year` have the lowest p-values.
+As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10e-3$ and $10e1$. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight`and `year` have the lowest p-values.
 The MSE on `ourAutoTrain` is
 ```{r,eval=TRUE,echo=TRUE}
 MSE_train
@@ -89,6 +82,7 @@ MSE_test
 
 * Q6. Explain how $k$-fold cross-validation is performed. 
 * Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation? 
+
 
 ##1d)
 
@@ -126,10 +120,13 @@ num_cov=which.min(mean.cv.errors)
 par(mfrow=c(1,1))
 plot(mean.cv.errors,type="b")
 ```
+
 * Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see this both from the plot and the list of averaged cross-validation errors. 
 
 * Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
 The new values for `ourAutoTest` are the same as in Q4 and Q5, as well as the MSE for the test set.
+
+
 ##2a) Explain figures
 
 * Q11: Which figure (1 or 2) corresponds to ridge and which figure corresponds to lasso? 
