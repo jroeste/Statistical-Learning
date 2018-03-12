@@ -64,7 +64,7 @@ library(ggplot2)
 library(nortest)
 #is it possible here to plot when we have seven covariates?
 ourAutofit.lm=lm(mpg~.-acceleration,data=ourAutoTrain)
-#summary(ourAutofit.lm)
+summary(ourAutofit.lm)
 MSE_train=mean((ourAutofit.lm$residuals)^2)
 
 y_hat=predict.lm(ourAutofit.lm,ourAutoTest)
@@ -75,6 +75,7 @@ ad.test(rstudent(ourAutofit.lm))
 ```
 As seen in the summary, we get estimates for $\hat\beta$. The standard `weight`and `year`
 * Q5: Use this model fit to predict new values for `ourAutoTest` and report the MSE.
+
 
 
 
@@ -90,7 +91,37 @@ As seen in the summary, we get estimates for $\hat\beta$. The standard `weight`a
 ```{r,eval=TRUE,echo=TRUE,results="hold"}
 library(caret)
 library(leaps)
-# and so on
+predict.regsubset = function(object, newdata, id){
+  form=as.formula(object$call[[2]])
+  mat=model.matrix(form,newdata)
+  coefi=coef(object,id=id)
+  xvars=names(coefi)
+  mat[,xvars]%*%coefi
+}
+k=10
+set.seed(4268)
+folds=sample(1:k,nrow(ourAutoTrain),replace=TRUE)
+cv.errors=matrix(NA,k,8,dimnames=list(NULL,paste(1:8)))
+
+#Perform crossvalidation:
+for (j in 1:k){
+  best.fit=regsubsets(mpg~.,data=ourAutoTrain[folds!=j,],nvmax=8)
+  for (i in 1:8){
+    pred=predict.regsubset(best.fit,ourAutoTrain[folds==j,],id=i)
+    cv.errors[j,i]=mean((ourAutoTrain$mpg[folds==j]-pred)^2)
+  }
+}
+mean.cv.errors=apply(cv.errors,2,mean)
+mean.cv.errors
+num_cov=which.min(mean.cv.errors)
+par(mfrow=c(1,1))
+plot(mean.cv.errors,type="b")
+```
+
+```{r,eval=TRUE,echo=TRUE,results="hold"}
+#Perform subsetselection:
+reg.best=regsubsets(mpg~.,data=ourAutoTrain,nvmax=8)
+coef(reg.best,num_cov)
 ```
 
 
