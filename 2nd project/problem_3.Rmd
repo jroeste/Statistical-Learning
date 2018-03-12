@@ -24,7 +24,6 @@ library(GGally)
 library(leaps)
 library(glmnet)
 library(ggplot2)
-
 library(ISLR)
 ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
                    "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
@@ -42,7 +41,7 @@ library(plyr)
 ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
                               to = c('Am','Eu','Jap'))
 gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
-                   weight+s(acceleration, 3)+factor(origin),data=ourAutoTrain)
+                   weight+s(acceleration, 3)+origin,data=ourAutoTrain)
 
 par(mfrow=c(2,3))
 plot(gamobject,se=TRUE,col="blue")
