@@ -1,0 +1,83 @@
+---
+subtitle: "TMA4268 Statistical Learning V2018"
+title: "Compulsory exercise 2: Problem 3"
+author: "NN1, NN2 and NN3"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: #3rd letter intentation hierarchy - uncomment html_document and comment pdf_document if neede
+  # html_document
+  pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+You need to install the following packages in R:
+
+```{r,eval=FALSE,echo=TRUE}
+install.packages("ISLR")
+install.packages("ggplot2")
+install.packages("GGally")
+install.packages("leaps")
+install.packages("glmnet")
+install.packages("gam")
+```
+
+# Problem 1 - Model selection and cross-validation 
+
+## a) Theory [1 point]
+
+* Q1. We will study a linear regression model with intercept $\beta_0$ present. We consider $d$ possible predictors. How many different linear regression models can be fitted?
+* Q2. Explain in a few words (presented as an algorithm) how we can use the best subset method with the BIC criterion to choose the best model out of all the possible models. What would happen if we instead used $R^2$ to choose the best model? 
+
+Hint: pages 244-247 in our textbook "Introduction to Statistical Learning".
+
+## b) Interpreting output [1 points]
+
+We will now study the `Auto` data set in the `ISLR` package. We will use `mpg` (miles pr gallon) as response, and selected covariates (see below, observe that we have recoded the `cylinders` into two groups, and that `origin` is a categorical covariate). We set aside 20% of the data (`ourAutoTest`) to be used to assess the selected model(s), and use the rest for model selection (`ourAutoTrain`).
+
+
+```{r}
+library(ISLR)
+ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
+                   "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
+                   "weight"=Auto$weight,"acceleration"=Auto$acceleration, 
+                   "year"=Auto$year,"origin"=as.factor(Auto$origin))
+colnames(ourAuto)
+ntot=dim(ourAuto)[1]
+ntot
+set.seed(4268)
+testids=sort(sample(1:ntot,ceiling(0.2*ntot),replace=FALSE))
+ourAutoTrain=ourAuto[-testids,]
+ourAutoTest=ourAuto[testids,]
+```
+
+Below we have performed best subset selection with the BIC criterion using the function `regsubsets` from the `leaps` package. 
+```{r}
+library(leaps)
+res=regsubsets(mpg~.,nbest=1,data=ourAutoTrain)
+sumres=summary(res)
+sumres
+plot(res,scale="bic")
+sumres$bic
+which.min(sumres$bic)
+coef(res,id=which.min(sumres$bic))
+```
+
+* Q3. How is the best model for each model complexity (number of parameters estimated) chosen? Write down the best model with 2 covariates (in addition to the intercept).
+* Q4. How can you choose between models of different model complexity? According to the BIC criterion, which is the best model? Fit this best model on `ourAutoTrain` and comment on the model fit. Report the MSE on `ourAutoTrain`.
+* Q5: Use this model fit to predict new values for `ourAutoTest` and report the MSE. 
+
+## c) Cross-validation [1 point]
+
+* Q6. Explain how $k$-fold cross-validation is performed (in a regression setting). 
+* Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation?
+
+## d) Programming $10$-fold cross-validation in R [2 points]
+
+Refer to pages 248-249 in our textbook "Introduction to Statistical Learning", and also [solutions to Recommended Problem 5 in Module 6](LINK) for hints on how to make the R code.
+
+* Q8. Write R code to perform $10$-fold cross-validation with the best subset method on `ourAutoTrain` (no, do not use `ourAutoTest` here). (Hint: smart to make a `predict.regsubsets` function as on page 249 in "Introduction to Statistical Learning".)
+* Q9. What is the optimal model complexity (number of parameters) in your regression? 
+* Q10. Use the model complexity you found in Q9 to find the best model on the `ourAutoTrain`. Report interesting features of this final model.  Also use this model fit to predict new values for `ourAutoTest` and report the MSE. (If you get the same best model as Q4, just refer back to Q4 and Q5.)
+

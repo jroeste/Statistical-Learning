@@ -46,13 +46,26 @@ gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
 
 par(mfrow=c(2,3))
 plot(gamobject,se=TRUE,col="blue")
-minDisplace=min(ourAutoTrain$displace)
-maxDisplace=max(ourAutoTrain$displace)
+
 ```
-The resulting plots shows the fitted GAM with five components, in addition to pointwise standard errors. The first component $f_1$ is a cubic spline in `displace` with one knot at 290. The curve indicates that 
+The resulting plots shows the fitted GAM with five components, in addition to the pointwise standard errors for each feature. In general, GAM-plots shows how the response, in our case the `mgp`, will vary when holding all but one of the variables constant. This is done for all five variables.
 
-* Q20: A basis for the cubic spline in `displace`: We have one knot $c_1=290$, in addition to the two boundary knots which come from the extreme values of `displace`, which is $c_0=68$ and $c_2=455$ and can easily be found from the training set using the min- and max-function in R like shown in the code above. We will have two basis functions, which takes the form
+Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response is smaller until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that the error curves in both ends are quite large. A reason for this is fewer data points in these areas.
+
+Moddle top: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
+
+Upper right: Linear regression fit using `weight` as predictor. The fitted curve indicates that an increase in weight will on average lead to a decrease in `mpg`.
+
+lower left: A smoothing spline with 3 degrees of freedom. Most of the data points lies in the area between 13 and 20. Here, the curve indicates that for increased acceleration of the car, the `mpg` will decrease. Few observations in the endpoints lead to large error curves here. 
+
+Lower right: Step function. We have observed more american vehicles, and hence the variance is much smaller for the american cars. On average the European cars have less `mpg` than American that in turn use slighty less than the Japanese cars.
+
+* Q20: We have an order $M=4$ spline with $K=1$ knot. In general we will have $M+K-1=4$ basis functions. In our case, the basis the cubic spline is $X,X^2,X^3,(x-c_1)_+^3$. The truncated power function is
 
 $$
-y_i=\beta_0 + 
+(x-290)^3= \begin{cases}(x-290)^3, x>290 \\
+0, \text{otherwise}
+\end{cases}
 $$
+for the knot $c_1=290$.
+
