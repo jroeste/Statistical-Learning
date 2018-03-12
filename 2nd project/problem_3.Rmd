@@ -24,7 +24,6 @@ library(GGally)
 library(leaps)
 library(glmnet)
 library(ggplot2)
-
 library(ISLR)
 ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
                    "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
@@ -42,7 +41,7 @@ library(plyr)
 ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
                               to = c('Am','Eu','Jap'))
 gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
-                   weight+s(acceleration, 3)+factor(origin),data=ourAutoTrain)
+                   weight+s(acceleration, 3)+origin,data=ourAutoTrain)
 
 par(mfrow=c(2,3))
 plot(gamobject,se=TRUE,col="blue")
@@ -52,7 +51,7 @@ The resulting plots shows the fitted GAM with five components, in addition to th
 
 Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response is smaller until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that the error curves in both ends are quite large. A reason for this is fewer data points in these areas.
 
-Moddle top: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
+Top, in the middle: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
 
 Upper right: Linear regression fit using `weight` as predictor. The fitted curve indicates that an increase in weight will on average lead to a decrease in `mpg`.
 
