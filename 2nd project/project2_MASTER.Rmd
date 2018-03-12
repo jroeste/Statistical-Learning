@@ -16,16 +16,17 @@ knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 ```
 ##1a)
   
-* Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
+Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
 
 <!--This comes from that we first have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
 $$\sum_{k=0}^{d} \binom{d}{k} = ... = 2^d.$$
 Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. -->
 
-* Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
+Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
 1. For $k=0,1,2,...,d$: \newline
 Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation. 
 2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion.
+
 If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a good training error, but a poor test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
 
 
@@ -56,10 +57,10 @@ coef(res,id=which.min(sumres$bic))
 
 ##1b)
 
-* Q3: As explained in the theory, the best model for each model complexity is chosen by taking the one with smallest RSS-value for a given number of predictors. The best model for computing miles pr gallon with two covariates is the one with `weight` and `year`. 
+Q3: As explained in the theory, the best model for each model complexity is chosen by taking the one with smallest RSS-value for a given number of predictors. The best model for computing miles pr gallon with two covariates is the one with `weight` and `year`. 
 
 
-* Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: intercept, cylinders, displace, horsepower, weight, year, origin2 and origin3. 
+Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: intercept, cylinders, displace, horsepower, weight, year, origin2 and origin3. 
 
 ```{r, eval=TRUE,echo=TRUE}
 library(ggplot2)
@@ -79,7 +80,7 @@ The MSE on `ourAutoTrain` is
 MSE_train
 ```
 
-* Q5: The predicted new values for $\hat Y$ are computed by `predict` and we get the following value for the MSE for the test set. 
+Q5: The predicted new values for $\hat Y$ are computed by `predict` and we get the following value for the MSE for the test set. 
 ```{r,eval=TRUE,echo=TRUE}
 y_hat=predict.lm(ourAutofit.lm,ourAutoTest)
 MSE_test=mean((y_hat-ourAutoTest$mpg)^2)
@@ -87,7 +88,7 @@ MSE_test
 ```
 ## c) Cross-validation [1 point]
 
-* Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. The first fold is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the $MSE$. The process is repated $k$ times, so the $MSE_i$ is calculated for fold $i=1,...,k$. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
+Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. The first fold is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the $MSE$. The process is repated $k$ times, so the $MSE_i$ is calculated for fold $i=1,...,k$. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
 
 $$
 MSE_k=\frac{1}{n_k}\sum_{i \in C_k}(y_i-\hat y_i)^2,
@@ -101,14 +102,14 @@ $$
 CV_k=\frac{1}{n}\sum_{i=j}^k n_k MSE_k
 $$
 
-* Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation?
+Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation?
 LOOCV is k-fold CV for $k=n$, so LOOCV is usually computationally more expensive than $k$-fold when $k$ is substantially smaller than $n$. This is because for the LOOCV $n$ different models is fitted, as opposed to $k=5$ or $k=10$ that is most common $k$-fold CV in practice. 
 
 Another reason for preferring $k$-fold CV over LOOCV comes from the bias-variance trade-off. LOOCV will have a low bias, but a rather high variance comapred to $k$-fold CV. This follows from the procedure of cross validation. One averages over model fits that consists of almost the same set of observations; only one observation differ for each model. This will cause high correlation between each model. When performing LOOCV, one is in general averaging over the models, and the higher correlated these are, the higher will the variance be. From this rationale, the models in $k$-fold cross-validation will be trained on less overlapping training data and will have less variance than the LOOCV.
 
 ##1d)
 
-* Q8: R code to perform a 10-fold cross-validation is used with the best subset method on `ourAutoTrain`.
+Q8: R code to perform a 10-fold cross-validation is used with the best subset method on `ourAutoTrain`.
 
 ```{r,eval=TRUE,echo=TRUE,results="hold"}
 library(caret)
@@ -142,9 +143,9 @@ num_cov=which.min(mean.cv.errors)
 par(mfrow=c(1,1))
 plot(mean.cv.errors,type="b")
 ```
-* Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see this both from the plot and the list of averaged cross-validation errors. 
+Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see this both from the plot and the list of averaged cross-validation errors. 
 
-* Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
+Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
 The new values for `ourAutoTest` are the same as in Q4 and Q5, as well as the MSE for the test set.
 
 ##2a) Explain figures
@@ -195,7 +196,7 @@ newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 
 ##3a)
 
-* Q19: Fitting the specified `gam`
+Q19: Fitting the specified `gam`: 
 
 ```{r,echo=TRUE, eval=TRUE}
 library(gam)
@@ -204,20 +205,6 @@ library(GGally)
 library(leaps)
 library(glmnet)
 library(ggplot2)
-
-library(ISLR)
-ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
-                   "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
-                   "weight"=Auto$weight,"acceleration"=Auto$acceleration, 
-                   "year"=Auto$year,"origin"=as.factor(Auto$origin))
-colnames(ourAuto)
-ntot=dim(ourAuto)[1]
-set.seed(4268)
-testids=sort(sample(1:ntot,ceiling(0.2*ntot),replace=FALSE))
-ourAutoTrain=ourAuto[-testids,]
-ourAutoTest=ourAuto[testids,]
-###i den endelige innleveringsfilen trenger vi bare kodesnutten herfra og ned###
-
 library(plyr)
 ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
                               to = c('Am','Eu','Jap'))
@@ -240,7 +227,7 @@ lower left: A smoothing spline with 3 degrees of freedom. Most of the data point
 
 Lower right: Step function. We have observed more american vehicles, and hence the variance is much smaller for the american cars. On average the European cars have less `mpg` than American that in turn use slighty less than the Japanese cars.
 
-* Q20: We have an order $M=4$ spline with $K=1$ knot. In general we will have $M+K-1=4$ basis functions. In our case, the basis the cubic spline is $X,X^2,X^3,(x-c_1)_+^3$. The truncated power function is
+Q20: We have an order $M=4$ spline with $K=1$ knot. In general we will have $M+K-1=4$ basis functions. In our case, the basis the cubic spline is $X,X^2,X^3,(x-c_1)_+^3$. The truncated power function is
 
 $$
 (x-290)^3= \begin{cases}(x-290)^3, x>290 \\
