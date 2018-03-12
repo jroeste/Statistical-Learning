@@ -23,6 +23,8 @@ When $\lambda \rightarrow \infty$ the $\beta$-values will approach zero in Ridge
 
 For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. In Ridge regression the coefficients will not become zero, and thus it does not perform model selection. 
 
+In problem 1b BIC is used to compare models with different number of included variables. Weight, year and cylinders are the variables that are included in most of the models in 1b. The best model according to the method in 1b is that where only the acceleration variable is excluded. In figure 1 both year and cylinders need a higher $\lambda$-value to become zero than most of the other variables. Weight has a very low coefficient value, and thus it it difficult to see when it becomes zero. However, it seems like the same trends of reletive importancy of the variables are captured in both methods. On the other hand, for a $\lambda$-value above 2, Lasso has set almost all of the variables to zero. Thus for a high $\lambda$-value, the method gives quite different results. The x-axis in figure 1 and 2 are not scales equally. In figure 2 a much higher $\lambda$-value is needed to have the coefficients approximately zero. Here is seems like year is goin more towards zero than cylinders and origin 3. This could be due to that year initially has a lower value.
+
 
 
 
