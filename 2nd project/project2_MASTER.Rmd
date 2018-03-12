@@ -148,11 +148,29 @@ Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see th
 Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
 The new values for `ourAutoTest` are the same as in Q4 and Q5, as well as the MSE for the test set.
 
+
 ##2a) Explain figures
 
-* Q11: Which figure (1 or 2) corresponds to ridge and which figure corresponds to lasso? 
-* Q12. Use the two figures and the above formulas to explain... 
-* Q13. Can you use lasso and/or ridge regression to perform model selection similar to what you did in Problem 1? 
+* Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
+
+This can be concluded from the fact that the coefficient values in the first figure becomes zero for large enough value of $\lambda$, which is only possible for Lasso and not for Ridge regression. In Ridge regression the coefficient values only approaches zero as $\lambda$ grows, which is corresponding to figure 2.  
+
+* Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the coefficient absolute values. This reduction increases with the value of $\lambda$.
+
+This can be seen from the formulas, as they include the terms $\lambda \sum_{j=1}^p \beta_j^2$ and $\lambda \sum_{j=1}^p |\beta_j|$ respectively in ridge regression and lasso. These terms favours $\beta$-values close to zero, as the $\beta$-values should be chosen to minimize the expressions for the two models. 
+
+This can also be seen from the figures as these displays how the coefficient values vary with $\lambda$. The standardized coefficients tends towards zero as $\lambda$ grows. 
+
+Increasing lambda will result in less flexibility of the model. As a consequence, increasing lamba means reducing variance and increasing bias. 
+
+When $\lambda \rightarrow \infty$ the $\beta$-values will approach zero in Ridge regression and become zero in Lasso in order to minimize the model expressions. When $\lambda = 0$ both Ridge regression and Lasso will produce the same output as ordinary least squares estimate, as the penalty term is removed.
+
+* Q13:
+
+For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. In Ridge regression the coefficients will not become zero, and thus it does not perform model selection. 
+
+
+
 
 ```{r,echo=FALSE,results="hide"}
 library(glmnet)
@@ -171,19 +189,49 @@ plot(cv.out)
 
 ##2b) Finding the optimal $\lambda$
 
-* Q14: Explain what the function `cv.glmnet` does. 
-* Q15. Explain what we see in the above plot.
-* Q16: Finding the optimal lambda:
+* Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
 
-```{r,echo=TRUE, eval=TRUE}
-# need some R code here
+* Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is the highest $\lambda$-values such that the MSE "is whithin one standard error of the minimum".
+
+* Q16: 
+
+```{r, echo=TRUE, eval=TRUE}
+
+library(glmnet)
+set.seed(4268)
+
+x=model.matrix(mpg~.,ourAutoTrain)[,-1] #-1 to remove the intercept.
+y=ourAutoTrain$mpg
+
+lambda=c(seq(from=5,to=0.1,length.out=150),0.01,0.0001) #Create a set of tuning parameters, adding low value to also see least squares fit
+cv.out=cv.glmnet(x,y,alpha=1,nfolds=10,lambda=lambda, standardize=TRUE) #alpha=1 gives lasso, alpha=0 gives ridge
 ```
+
+
+The $\lambda$-value that gives lowest MSE is
+```{r, echo=TRUE, eval=TRUE}
+
+cv.out$lambda.min
+```
+
+And the value that corresponds to 1se is
+```{r, echo=TRUE, eval=TRUE}
+L = cv.out$lambda.1se
+cv.out$lambda.1se
+
+```
+
+We chose the last one to be the optimal $\lambda$, and use this for the next exercise.
 
 ##2c) Prediction
 
-* Q17: Fit model, coefficients,...
+* Q17: 
+Fitting a model with lasso using $\lambda = 0.01$ gives the following coefficients
+
 ```{r,echo=TRUE, eval=TRUE}
-# fit the lasso
+lasso = glmnet(x, y, alpha=1, lambda = L)
+
+coef(lasso)
 ```
 
 ```{r,,echo=TRUE, eval=TRUE}
@@ -193,6 +241,22 @@ newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 ```
 
 * Q18: Predicted value:
+
+Thus the model is
+
+$$Y = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}-0.0061x_{weight}+0.12x_{acceleration} +0.78x_{year}+1.68x_{origin2}+2.83x_{origin3}$$
+
+Q18:
+
+The predicted mpg for the car with displace=150, horsepower=100, weight=3000, acceleration=10, year=82 and comes from Europe is
+```{r, echo=FALSE}
+x= 
+
+P = predict(lasso, newx=matrix(c(0,150,100,3000,10,82,1,0),nrow=1), s=L)
+P
+
+```
+
 
 ##3a)
 
@@ -206,8 +270,10 @@ library(leaps)
 library(glmnet)
 library(ggplot2)
 library(plyr)
-ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
-                              to = c('Am','Eu','Jap'))
+#ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
+ #                             to = c('Am','Eu','Jap'))
+ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1","2","3"),
+                              to = c("Am","Eu","Jap"))
 gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
                    weight+s(acceleration, 3)+origin,data=ourAutoTrain)
 
