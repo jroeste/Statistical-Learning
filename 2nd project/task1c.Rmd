@@ -25,53 +25,28 @@ install.packages("gam")
 
 # Problem 1 - Model selection and cross-validation 
 
-## a) Theory [1 point]
-
-* Q1. We will study a linear regression model with intercept $\beta_0$ present. We consider $d$ possible predictors. How many different linear regression models can be fitted?
-* Q2. Explain in a few words (presented as an algorithm) how we can use the best subset method with the BIC criterion to choose the best model out of all the possible models. What would happen if we instead used $R^2$ to choose the best model? 
-
-Hint: pages 244-247 in our textbook "Introduction to Statistical Learning".
-
-## b) Interpreting output [1 points]
-
-We will now study the `Auto` data set in the `ISLR` package. We will use `mpg` (miles pr gallon) as response, and selected covariates (see below, observe that we have recoded the `cylinders` into two groups, and that `origin` is a categorical covariate). We set aside 20% of the data (`ourAutoTest`) to be used to assess the selected model(s), and use the rest for model selection (`ourAutoTrain`).
-
-
-```{r}
-library(ISLR)
-ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
-                   "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
-                   "weight"=Auto$weight,"acceleration"=Auto$acceleration, 
-                   "year"=Auto$year,"origin"=as.factor(Auto$origin))
-colnames(ourAuto)
-ntot=dim(ourAuto)[1]
-ntot
-set.seed(4268)
-testids=sort(sample(1:ntot,ceiling(0.2*ntot),replace=FALSE))
-ourAutoTrain=ourAuto[-testids,]
-ourAutoTest=ourAuto[testids,]
-```
-
-Below we have performed best subset selection with the BIC criterion using the function `regsubsets` from the `leaps` package. 
-```{r}
-library(leaps)
-res=regsubsets(mpg~.,nbest=1,data=ourAutoTrain)
-sumres=summary(res)
-sumres
-plot(res,scale="bic")
-sumres$bic
-which.min(sumres$bic)
-coef(res,id=which.min(sumres$bic))
-```
-
-* Q3. How is the best model for each model complexity (number of parameters estimated) chosen? Write down the best model with 2 covariates (in addition to the intercept).
-* Q4. How can you choose between models of different model complexity? According to the BIC criterion, which is the best model? Fit this best model on `ourAutoTrain` and comment on the model fit. Report the MSE on `ourAutoTrain`.
-* Q5: Use this model fit to predict new values for `ourAutoTest` and report the MSE. 
 
 ## c) Cross-validation [1 point]
 
-* Q6. Explain how $k$-fold cross-validation is performed (in a regression setting). 
+* Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. The first fold is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the $MSE$. The process is repated $k$ times, so the $MSE_i$ is calculated for fold $i=1,...,k$. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
+
+$$
+MSE_k=\frac{1}{n_k}\sum_{i \in C_k}(y_i-\hat y_i)^2,
+$$
+where $C_k$ denotes the held-out fold $k$, $\hat y_i$ is the fit obtained when holding out data from $C_k$, and $n_k$ is the number of observations in fold $k$. 
+
+The final CV estimate is the average of all the $k$ MSEs:
+
+$$
+CV_k=\frac{1}{n}\sum_{i=j}^k n_k MSE_k
+
+$$
+
 * Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation?
+LOOCV is k-fold CV for $k=n$, so LOOCV is usually computationally more expensive than $k$-fold when $k$ is substantially smaller than $n$. This is because for the LOOCV $n$ different models is fitted, as opposed to $k=5$ or $k=10$ that is most common $k$-fold CV in practice. 
+
+Another reason for preferring $k$-fold CV over LOOCV comes from the bias-variance trade-off. LOOCV will have a low bias, but a rather high variance comapred to $k$-fold CV. This follows from the procedure of cross validation. One averages over model fits that consists of almost the same set of observations; only one observation differ for each model. This will cause high correlation between each model. When performing LOOCV, one is in general averaging over the models, and the higher correlated these are, the higher will the variance be. From this rationale, the models in $k$-fold cross-validation will be trained on less overlapping training data and will have less variance than the LOOCV.
+
 
 ## d) Programming $10$-fold cross-validation in R [2 points]
 
