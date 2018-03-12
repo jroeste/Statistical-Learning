@@ -1,15 +1,12 @@
 ---
-subtitle: "TMA4268 Statistical Learning V2018"
 title: "Compulsory exercise 2"
-author: "Astrid Langsrud, Ida Marie Falnes, Julie Røste - group xx"
-date: $\today$
-output: #3rd letter intentation hierarchy
-  pdf_document:
-  #   theme: tactile
-  #   highlight: github
-  # prettydoc::html_pretty:
-#editor_options: 
-#  chunk_output_type: console
+author: "Astrid Langsrud, Ida Marie Falnes, Julie RÃ¸ste - group xx"
+date: "$\today$"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: null
+subtitle: TMA4268 Statistical Learning V2018
 ---
   
 ```{r setup, include=FALSE}
