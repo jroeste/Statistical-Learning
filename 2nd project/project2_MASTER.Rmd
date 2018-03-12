@@ -269,11 +269,6 @@ library(GGally)
 library(leaps)
 library(glmnet)
 library(ggplot2)
-library(plyr)
-#ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
- #                             to = c('Am','Eu','Jap'))
-ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1","2","3"),
-                              to = c("Am","Eu","Jap"))
 gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
                    weight+s(acceleration, 3)+origin,data=ourAutoTrain)
 
