@@ -1,6 +1,6 @@
 ---
 title: 'Compulsory exercise 2: Group 19'
-author: "Ida Marie Falnes, Astrid Langsrud and Julie RÃ¸ste"
+author: "Ida Marie Falnes, Astrid Langsrud and Julie Røste"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document: default
