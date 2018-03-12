@@ -34,5 +34,13 @@ gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+weight+s(accel
 ?par
 (par(mfrow=c(2,3)))
 plot(gamobject,se=TRUE,col="blue")
+
+displ=data.frame('displace'=ourAutoTrain$displace,'mpg'=ourAutoTrain$mpg)
+
+ggplot(displ, aes(x=displace,y=mpg))+geom_point()
 min(ourAutoTrain$displace)
 max(ourAutoTrain$displace)
+
+ggplot(ourAutoTrain, aes(x=horsepower,y=mpg))+ geom_point()
+ggplot(ourAutoTrain, aes(x=weight,y=mpg))+ geom_point()
+ggplot(ourAutoTrain, aes(x=acceleration,y=mpg))+ geom_point()
