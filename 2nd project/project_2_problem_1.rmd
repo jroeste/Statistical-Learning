@@ -13,7 +13,6 @@ knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 * Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
 
 
-
 * Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
 1. For $k=0,1,2,...,d$: \newline
 Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation. 
