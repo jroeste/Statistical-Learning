@@ -17,15 +17,16 @@ knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 ##1a)
   
 Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
-
-<!--This comes from that we first have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
+Another way to come up with the same result is to look at the different models for each complexity. First we have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
 $$\sum_{k=0}^{d} \binom{d}{k} = ... = 2^d.$$
-Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. -->
+Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. 
 
-Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
+Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the following algorithm:
+
 1. For $k=0,1,2,...,d$: \newline
-Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation. 
-2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion.
+Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation.
+
+2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion, where $\text{BIC}=\frac{1}{n}(RSS+log(n)k{\hat\sigma}^2)$ with ${\hat\sigma}^2$ as an unbiased estimator for the variance.
 
 If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a good training error, but a poor test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
 
@@ -74,7 +75,7 @@ MSE_train=mean((ourAutofit.lm$residuals)^2)
 #ad.test(rstudent(ourAutofit.lm))
 ```
 
-As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight`and `year` have the lowest p-values.
+As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values.
 The MSE on `ourAutoTrain` is
 ```{r,eval=TRUE,echo=TRUE}
 MSE_train
@@ -86,7 +87,7 @@ y_hat=predict.lm(ourAutofit.lm,ourAutoTest)
 MSE_test=mean((y_hat-ourAutoTest$mpg)^2)
 MSE_test
 ```
-## c) Cross-validation [1 point]
+##1c)
 
 Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. The first fold is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the $MSE$. The process is repated $k$ times, so the $MSE_i$ is calculated for fold $i=1,...,k$. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
 
@@ -151,11 +152,11 @@ The new values for `ourAutoTest` are the same as in Q4 and Q5, as well as the MS
 
 ##2a) Explain figures
 
-* Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
+Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
 
 This can be concluded from the fact that the coefficient values in the first figure becomes zero for large enough value of $\lambda$, which is only possible for Lasso and not for Ridge regression. In Ridge regression the coefficient values only approaches zero as $\lambda$ grows, which is corresponding to figure 2.  
 
-* Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the coefficient absolute values. This reduction increases with the value of $\lambda$.
+Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the coefficient absolute values. This reduction increases with the value of $\lambda$.
 
 This can be seen from the formulas, as they include the terms $\lambda \sum_{j=1}^p \beta_j^2$ and $\lambda \sum_{j=1}^p |\beta_j|$ respectively in ridge regression and lasso. These terms favours $\beta$-values close to zero, as the $\beta$-values should be chosen to minimize the expressions for the two models. 
 
@@ -165,11 +166,9 @@ Increasing lambda will result in less flexibility of the model. As a consequence
 
 When $\lambda \rightarrow \infty$ the $\beta$-values will approach zero in Ridge regression and become zero in Lasso in order to minimize the model expressions. When $\lambda = 0$ both Ridge regression and Lasso will produce the same output as ordinary least squares estimate, as the penalty term is removed.
 
-* Q13:
+Q13:
 
 For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. In Ridge regression the coefficients will not become zero, and thus it does not perform model selection. 
-
-
 
 
 ```{r,echo=FALSE,results="hide"}
@@ -189,14 +188,13 @@ plot(cv.out)
 
 ##2b) Finding the optimal $\lambda$
 
-* Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
+Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
 
-* Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is the highest $\lambda$-values such that the MSE "is whithin one standard error of the minimum".
+Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is the highest $\lambda$-values such that the MSE "is whithin one standard error of the minimum".
 
-* Q16: 
+Q16: 
 
 ```{r, echo=TRUE, eval=TRUE}
-
 library(glmnet)
 set.seed(4268)
 
@@ -221,11 +219,11 @@ cv.out$lambda.1se
 
 ```
 
-We chose the last one to be the optimal $\lambda$, and use this for the next exercise.
+We chose the last one to be the optimal $\lambda$, and we will use this for the next exercise.
 
 ##2c) Prediction
 
-* Q17: 
+Q17: 
 Fitting a model with lasso using $\lambda = 0.01$ gives the following coefficients
 
 ```{r,echo=TRUE, eval=TRUE}
@@ -240,7 +238,7 @@ newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 # then do the prediction
 ```
 
-* Q18: Predicted value:
+Q18: Predicted value:
 
 Thus the model is
 
