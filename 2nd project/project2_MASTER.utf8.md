@@ -1,7 +1,7 @@
 ---
 title: 'Compulsory exercise 2: Group 19'
-author: "Ida Marie Falnes, Astrid Langsrud and Julie Røste"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Ida Marie Falnes, Astrid Langsrud and Julie RÃ¸ste"
+date: "13 mars, 2018"
 output:
   pdf_document: default
   html_document:
@@ -11,9 +11,7 @@ editor_options:
   chunk_output_type: console
 ---
   
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
-```
+
 ##1a)
   
 Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
@@ -31,30 +29,7 @@ Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the m
 If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a good training error, but a poor test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
 
 
-```{r,echo=FALSE,results="hide"}
-library(ISLR)
-ourAuto=data.frame("mpg"=Auto$mpg,"cylinders"=factor(cut(Auto$cylinders,2)),
-                   "displace"=Auto$displacement,"horsepower"=Auto$horsepower,
-                   "weight"=Auto$weight,"acceleration"=Auto$acceleration, 
-                   "year"=Auto$year,"origin"=as.factor(Auto$origin))
-colnames(ourAuto)
-ntot=dim(ourAuto)[1]
-ntot
-set.seed(4268)
-testids=sort(sample(1:ntot,ceiling(0.2*ntot),replace=FALSE))
-ourAutoTrain=ourAuto[-testids,]
-ourAutoTest=ourAuto[testids,]
-n_train=dim(ourAutoTrain)[1]
-n_test=dim(ourAutoTest)[1]
-library(leaps)
-res=regsubsets(mpg~.,nbest=1,data=ourAutoTrain)
-sumres=summary(res)
-sumres
-plot(res,scale="bic")
-sumres$bic
-which.min(sumres$bic)
-coef(res,id=which.min(sumres$bic))
-```
+![](project2_MASTER_files/figure-latex/unnamed-chunk-1-1.pdf)<!-- --> 
 
 ##1b)
 
@@ -63,7 +38,8 @@ Q3: As explained in the theory, the best model for each model complexity is chos
 
 Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: intercept, cylinders, displace, horsepower, weight, year, origin2 and origin3. 
 
-```{r, eval=TRUE,echo=TRUE}
+
+```r
 library(ggplot2)
 library(nortest)
 #Fit the model with all covariates except `acceleration`.
@@ -75,17 +51,54 @@ MSE_train=mean((ourAutofit.lm$residuals)^2)
 #ad.test(rstudent(ourAutofit.lm))
 ```
 
+```
+## 
+## Call:
+## lm(formula = mpg ~ . - acceleration, data = ourAutoTrain)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.7254 -2.0561 -0.3412  1.7122 12.9550 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)         -1.941e+01  4.589e+00  -4.230 3.09e-05 ***
+## cylinders(5.5,8.01] -3.533e+00  7.469e-01  -4.730 3.43e-06 ***
+## displace             3.279e-02  6.749e-03   4.858 1.90e-06 ***
+## horsepower          -4.883e-02  1.184e-02  -4.124 4.80e-05 ***
+## weight              -5.824e-03  6.185e-04  -9.415  < 2e-16 ***
+## year                 7.849e-01  5.699e-02  13.771  < 2e-16 ***
+## origin2              1.794e+00  6.204e-01   2.892  0.00411 ** 
+## origin3              2.906e+00  5.943e-01   4.891 1.63e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.233 on 305 degrees of freedom
+## Multiple R-squared:  0.8344,	Adjusted R-squared:  0.8306 
+## F-statistic: 219.6 on 7 and 305 DF,  p-value: < 2.2e-16
+```
+
 As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values.
 The MSE on `ourAutoTrain` is
-```{r,eval=TRUE,echo=TRUE}
+
+```r
 MSE_train
 ```
 
+```
+## [1] 10.18351
+```
+
 Q5: The predicted new values for $\hat Y$ are computed by `predict` and we get the following value for the MSE for the test set. 
-```{r,eval=TRUE,echo=TRUE}
+
+```r
 y_hat=predict.lm(ourAutofit.lm,ourAutoTest)
 MSE_test=mean((y_hat-ourAutoTest$mpg)^2)
 MSE_test
+```
+
+```
+## [1] 8.931018
 ```
 ##1c)
 
@@ -112,7 +125,8 @@ Another reason for preferring $k$-fold CV over LOOCV comes from the bias-varianc
 
 Q8: R code to perform a 10-fold cross-validation is used with the best subset method on `ourAutoTrain`.
 
-```{r,eval=TRUE,echo=TRUE,results="hold"}
+
+```r
 library(caret)
 library(leaps)
 #Predict function
@@ -144,6 +158,13 @@ num_cov=which.min(mean.cv.errors)
 par(mfrow=c(1,1))
 plot(mean.cv.errors,type="b")
 ```
+
+![](project2_MASTER_files/figure-latex/unnamed-chunk-5-1.pdf)<!-- --> 
+
+```
+##        1        2        3        4        5        6        7        8 
+## 20.04605 11.98844 11.92601 11.29254 11.71515 10.72818 10.56209 10.61032
+```
 Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see this both from the plot and the list of averaged cross-validation errors. 
 
 Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
@@ -171,20 +192,7 @@ Q13:
 For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. In Ridge regression the coefficients will not become zero, and thus it does not perform model selection. 
 
 
-```{r,echo=FALSE,results="hide"}
-library(glmnet)
-set.seed(4268)
-
-x=model.matrix(mpg~.,ourAutoTrain)[,-1] #-1 to remove the intercept.
-head(x)
-y=ourAutoTrain$mpg
-
-lambda=c(seq(from=5,to=0.1,length.out=150),0.01,0.0001) #Create a set of tuning parameters, adding low value to also see least squares fit
-cv.out=cv.glmnet(x,y,alpha=1,nfolds=10,lambda=lambda, standardize=TRUE) #alpha=1 gives lasso, alpha=0 gives ridge
-
-plot(cv.out)
-
-```
+![](project2_MASTER_files/figure-latex/unnamed-chunk-6-1.pdf)<!-- --> 
 
 ##2b) Finding the optimal $\lambda$
 
@@ -194,7 +202,8 @@ Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE t
 
 Q16: 
 
-```{r, echo=TRUE, eval=TRUE}
+
+```r
 library(glmnet)
 set.seed(4268)
 
@@ -207,16 +216,24 @@ cv.out=cv.glmnet(x,y,alpha=1,nfolds=10,lambda=lambda, standardize=TRUE) #alpha=1
 
 
 The $\lambda$-value that gives lowest MSE is
-```{r, echo=TRUE, eval=TRUE}
 
+```r
 cv.out$lambda.min
 ```
 
+```
+## [1] 1e-04
+```
+
 And the value that corresponds to 1se is
-```{r, echo=TRUE, eval=TRUE}
+
+```r
 L = cv.out$lambda.1se
 cv.out$lambda.1se
+```
 
+```
+## [1] 0.01
 ```
 
 We chose the last one to be the optimal $\lambda$, and we will use this for the next exercise.
@@ -226,13 +243,29 @@ We chose the last one to be the optimal $\lambda$, and we will use this for the 
 Q17: 
 Fitting a model with lasso using $\lambda = 0.01$ gives the following coefficients
 
-```{r,echo=TRUE, eval=TRUE}
+
+```r
 lasso = glmnet(x, y, alpha=1, lambda = L)
 
 coef(lasso)
 ```
 
-```{r,,echo=TRUE, eval=TRUE}
+```
+## 9 x 1 sparse Matrix of class "dgCMatrix"
+##                                s0
+## (Intercept)         -21.475534414
+## cylinders(5.5,8.01]  -3.383985180
+## displace              0.031030021
+## horsepower           -0.035228794
+## weight               -0.006084397
+## acceleration          0.124425729
+## year                  0.782180280
+## origin2               1.676410824
+## origin3               2.832044860
+```
+
+
+```r
 # 0 for cylinder, displace, horsepower, weight, acceleration, year, 0 for origin2 and 0 for origin3
 newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 # then do the prediction
@@ -247,12 +280,10 @@ $$Y = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}-0.0061x
 Q18:
 
 The predicted mpg for the car with displace=150, horsepower=100, weight=3000, acceleration=10, year=82 and comes from Europe is
-```{r, echo=FALSE}
-x= 
 
-P = predict(lasso, newx=matrix(c(0,150,100,3000,10,82,1,0),nrow=1), s=L)
-P
-
+```
+##             1
+## [1,] 28.46235
 ```
 
 
@@ -260,7 +291,8 @@ P
 
 Q19: Fitting the specified `gam`: 
 
-```{r,echo=TRUE, eval=TRUE}
+
+```r
 library(gam)
 library(ISLR)
 library(GGally)
@@ -272,8 +304,9 @@ gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
 
 par(mfrow=c(2,3))
 plot(gamobject,se=TRUE,col="blue")
-
 ```
+
+![](project2_MASTER_files/figure-latex/unnamed-chunk-13-1.pdf)<!-- --> 
 The resulting plots shows the fitted GAM with five components, in addition to the pointwise standard errors for each feature. In general, GAM-plots shows how the response, in our case the `mpg`, will vary when holding all but one of the variables constant. This is done for all five variables.
 
 Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response will slightly increase until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that there are fewer observations from about 300 on the `displace`-axis, so error curves in this area is quite large. 
