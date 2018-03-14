@@ -24,11 +24,11 @@ Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $
 Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the following algorithm:
 
 1. For $k=0,1,2,...,d$: \newline
-Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation.
+Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with the smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation.
 
 2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion, where $\text{BIC}=\frac{1}{n}(RSS+log(n)k{\hat\sigma}^2)$ with ${\hat\sigma}^2$ as an unbiased estimator for the variance.
 
-If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a good training error, but a poor test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
+If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a lowtraining err or, but a high test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
 
 
 ```{r,echo=FALSE,results="hide"}
@@ -56,11 +56,18 @@ coef(res,id=which.min(sumres$bic))
 ```
 
 ##1b)
+```{r,echo=TRUE,eval=TRUE}
+res_2=lm(mpg~weight+year,nbest=1,data=ourAutoTrain)
+coef(summary(res_2))
+```
 
-Q3: As explained in the theory, the best model for each model complexity is chosen by taking the one with smallest RSS-value for a given number of predictors. The best model for computing miles pr gallon with two covariates is the one with `weight` and `year`. 
+Q3: As explained in the theory, the best model for each model complexity is chosen by computing RSS for all permutations and taking the one with smallest RSS-value for the model complexity. The best model for computing miles pr gallon with two covariates is the one with `weight` and `year`. 
+$$
+\boldsymbol{\hat Y} = -18.504-0.0065\text{weight}+0.8067\text{year}
+$$
 
 
-Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: intercept, cylinders, displace, horsepower, weight, year, origin2 and origin3. 
+Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest computed BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: ´intercept´, ´cylinders´, ´displace´, ´horsepower´, ´weight´, ´year´, ´origin2´ and ´origin3´. 
 
 ```{r, eval=TRUE,echo=TRUE}
 library(ggplot2)
@@ -73,7 +80,7 @@ MSE_train=mean((ourAutofit.lm$residuals)^2)
 ad.test(rstudent(ourAutofit.lm))
 ```
 
-As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept, and compared to the size of the estimates, . When looking at the p-values for the covariates, all are below the significane level, $\alpha=0.05$, which means that we should believe there is a linear dependence between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values. Also, the $R^2$-value is relatively close to 1. On the other hand, the Anderson Darling Normality test gives us a p-value of order $10^{-6}$ which indicates that the errors might not be normal distributed and that the linear linear dependence not is that good. 
+As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the `intercept`, and compared to the size of the estimates, `origin2` has the lowest t-value in absolute value. When looking at the p-values for the covariates, all are below the significane level, $\alpha=0.05$, which means that we should believe there is a linear dependence between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values. Also, the $R^2$-value is relatively close to 1. On the other hand, the Anderson Darling Normality test gives us a p-value of order $10^{-6}$ which indicates that the errors might not be normal distributed and that the linear linear dependence not is that good. 
 The MSE on `ourAutoTrain` is
 ```{r,eval=TRUE,echo=TRUE}
 MSE_train
@@ -101,6 +108,7 @@ $$
 CV_k=\sum_{j=1}^k \frac{n_j}{n}MSE_j,
 $$
 where $\text{MSE}_j$ is given by the equation above. 
+
 Q7. Why $k$-fold cross-validation may be preferred to leave-one-out cross-validation:
 LOOCV is k-fold CV when $k=n$. When $k$ is substantially smaller than $n$, it follows that LOOCV usually is computationally more expensive than $k$-fold. This is because for the LOOCV $n$ different models is fitted, as opposed to only $k$ models in $k$-fold. In practice $k=5$ or $k=10$ is most common, as these values has turned out to give the best compromise between bias and variance, as we will discuss next.
 
