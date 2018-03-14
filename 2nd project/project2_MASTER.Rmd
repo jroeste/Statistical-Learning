@@ -238,7 +238,9 @@ newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 ```
 Thus the model is
 
-$$Y = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}-0.0061x_{weight}+0.12x_{acceleration} +0.78x_{year}+1.68x_{origin2}+2.83x_{origin3}$$
+$$
+Y = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}-0.0061x_{weight}+0.12x_{acceleration} +0.78x_{year}+1.68x_{origin2}+2.83x_{origin3}
+$$
 
 Q18:
 
@@ -271,11 +273,11 @@ plot(gamobject,se=TRUE,col="blue")
 ```
 The resulting plots shows the fitted GAM with five components, in addition to the pointwise standard errors for each feature. In general, GAM-plots shows how the response, in our case the `mpg`, will vary when holding all but one of the variables constant. This is done for all five variables.
 
-Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response will slightly increase until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that there are fewer observations from about 300 on the `displace`-axis, so error curves in this area is quite large. 
+Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. The curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response will slightly increase until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that there are fewer observations from about 300 on the `displace`-axis, so error curves in this area is quite large. In addition, the model will in general be based on fewer data points in the beginning and end intervals. This is because there are no data points outside of the interval.
 
 Top row, middle plot: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
 
-Upper right: Linear regression fit using `weight` as predictor. The fitted curve indicates that an increase in weight will on average lead to a decrease in `mpg`.
+Upper right: Linear regression fit using `weight` as predictor. The fitted curve indicates that an increase in weight will on average lead to a decrease in `mpg`. The error curves are also linear and larger in the endpoints.
 
 lower left: A smoothing spline with 3 degrees of freedom. Most of the data points lies in the area between 13 and 20. Here, the curve indicates that for increased acceleration of the car, the `mpg` will decrease. Few observations in the endpoints lead to large error curves here. 
 
