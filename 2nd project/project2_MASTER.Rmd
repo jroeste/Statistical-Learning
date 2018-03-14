@@ -281,7 +281,7 @@ Upper right: Linear regression fit using `weight` as predictor. The fitted curve
 
 lower left: A smoothing spline with 3 degrees of freedom. Most of the data points lies in the area between 13 and 20. Here, the curve indicates that for increased acceleration of the car, the `mpg` will decrease. Few observations in the endpoints lead to large error curves here. 
 
-Lower right: Step function. We have observed more american vehicles, and the variance is much smaller for the these cars. On average the European cars have less `mpg` than Americans, that in turn use slighty less than the Japanese cars, according to our data.
+Lower right: Step function. On average the plot indicates that European cars use less `mpg` than American cars, that in turn use slighty less than the Japanese cars. Note that the variance in boxplots for European and Japanese cars are larger than the American. This can be explained by more observations of american vehicles in the data set.
 
 Q20: We have an order $M=4$ spline with $K=1$ knot. In general we will have $M+K-1=4$ basis functions. In our case, the basis the cubic spline is $X,X^2,X^3,(x-c_1)_+^3$. The truncated power function is
 
