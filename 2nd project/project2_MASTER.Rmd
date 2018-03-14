@@ -73,7 +73,7 @@ MSE_train=mean((ourAutofit.lm$residuals)^2)
 ad.test(rstudent(ourAutofit.lm))
 ```
 
-As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear dependence between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values. Also, the $R^2$-value is relatively close to 1. ##Comment here on the Anderson Darling. ##
+As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept, and compared to the size of the estimates, . When looking at the p-values for the covariates, all are below the significane level, $\alpha=0.05$, which means that we should believe there is a linear dependence between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values. Also, the $R^2$-value is relatively close to 1. On the other hand, the Anderson Darling Normality test gives us a p-value of order $10^{-6}$ which indicates that the errors might not be normal distributed and that the linear linear dependence not is that good. 
 The MSE on `ourAutoTrain` is
 ```{r,eval=TRUE,echo=TRUE}
 MSE_train
@@ -87,7 +87,7 @@ MSE_test
 ```
 ##1c)
 
-Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. One of these folds is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the mean squared error ($MSE$) for the fitted model. The process is repated $k$ times, so an $MSE$ is calculated for each fold. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
+Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. One of these folds is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the mean squared error ($MSE$) for the fitted model. The process is repated $k$ times, so an $MSE$ is calculated for each fold. If $n$ is a multiple of $k$, we have in average $n_k=n/k$ and the formula for $MSE_k$ is
 
 $$
 MSE_k=\frac{1}{n_k}\sum_{i \in C_k}(y_i-\hat y_i)^2,
@@ -98,9 +98,9 @@ where $C_k$ denotes the held-out fold $k$, $\hat y_i$ is the fit obtained when h
 The final CV estimate is the average of all the $k$ MSEs:
 
 $$
-CV_k=\sum_{i=1}^k \frac{n_k}{n}MSE_k
+CV_k=\sum_{j=1}^k \frac{n_j}{n}MSE_j,
 $$
-
+where $\text{MSE}_j$ is given by the equation above. 
 Q7. Why $k$-fold cross-validation may be preferred to leave-one-out cross-validation:
 LOOCV is k-fold CV when $k=n$. When $k$ is substantially smaller than $n$, it follows that LOOCV usually is computationally more expensive than $k$-fold. This is because for the LOOCV $n$ different models is fitted, as opposed to only $k$ models in $k$-fold. In practice $k=5$ or $k=10$ is most common, as these values has turned out to give the best compromise between bias and variance, as we will discuss next.
 
