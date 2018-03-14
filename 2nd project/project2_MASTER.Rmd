@@ -1,6 +1,6 @@
 ---
 title: 'Compulsory exercise 2: Group 19'
-author: "Ida Marie Falnes, Astrid Langsrud and Julie RÃ¸ste"
+author: "Ida Marie Falnes, Astrid Langsrud and Julie Røste"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document: default
@@ -17,15 +17,16 @@ knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 ##1a)
   
 Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
-
-<!--This comes from that we first have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
+Another way to come up with the same result is to look at the different models for each complexity. First we have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
 $$\sum_{k=0}^{d} \binom{d}{k} = ... = 2^d.$$
-Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. -->
+Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. 
 
-Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the followning algorithm:
+Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the following algorithm:
+
 1. For $k=0,1,2,...,d$: \newline
-Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation. 
-2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion.
+Fit all $\binom{d}{k}$ models that contain exactly k predictors. Then find the model with smallest RSS (largest $R^2$) and call it $\mathcal{M}_k$. For the case with $k=0$, we get $\mathcal{M}_0$, which simply predicts the sample mean for each observation.
+
+2. Select the best model among $\mathcal{M}_0, ...,\mathcal{M}_d$ using the BIC-criterion, where $\text{BIC}=\frac{1}{n}(RSS+log(n)k{\hat\sigma}^2)$ with ${\hat\sigma}^2$ as an unbiased estimator for the variance.
 
 If we instead of BIC simply used $R^2$ as our base for selecting a model, we would get a good training error, but a poor test error. This is because the training error will decrease as more variables are included in the model, and we surely get a model with as many predictors as possible, which may cause overfitting. However, $R^2$ is good when comparing models with the same numbers of predictors, as in part 1 of the algorithm.
 
@@ -49,7 +50,6 @@ library(leaps)
 res=regsubsets(mpg~.,nbest=1,data=ourAutoTrain)
 sumres=summary(res)
 sumres
-plot(res,scale="bic")
 sumres$bic
 which.min(sumres$bic)
 coef(res,id=which.min(sumres$bic))
@@ -70,11 +70,10 @@ ourAutofit.lm=lm(mpg~.-acceleration,data=ourAutoTrain)
 summary(ourAutofit.lm)
 MSE_train=mean((ourAutofit.lm$residuals)^2)
 
-#"Anderson-Darling normality test"
-#ad.test(rstudent(ourAutofit.lm))
+ad.test(rstudent(ourAutofit.lm))
 ```
 
-As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear connection between `miles per gallon` and the covariates. Among the covariates, `weight`and `year` have the lowest p-values.
+As seen in the summary, we get estimates for the $\hat\beta$'s. In general the estimates for $\hat\beta$'s vary between order $10^{-3}$ and 10. The standard error is largest for the intercept. When looking at the p-values for the covariates, all are below the significane level, which means that we should believe there is a linear dependence between `miles per gallon` and the covariates. Among the covariates, `weight` and `year` have the lowest p-values. Also, the $R^2$-value is relatively close to 1. ##Comment here on the Anderson Darling. ##
 The MSE on `ourAutoTrain` is
 ```{r,eval=TRUE,echo=TRUE}
 MSE_train
@@ -86,9 +85,9 @@ y_hat=predict.lm(ourAutofit.lm,ourAutoTest)
 MSE_test=mean((y_hat-ourAutoTest$mpg)^2)
 MSE_test
 ```
-## c) Cross-validation [1 point]
+##1c)
 
-Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. The first fold is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the $MSE$. The process is repated $k$ times, so the $MSE_i$ is calculated for fold $i=1,...,k$. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
+Q6: $k$-fold cross validation is performed by randomly dividing the data set consisting of $n$ observations into $k$ approximately equally sized groups, or $folds$. One of these folds is left out and kept as a validation set, and the remaining $k-1$ folds are used to fit the model. Then the validation set is used to calculate the mean squared error ($MSE$) for the fitted model. The process is repated $k$ times, so an $MSE$ is calculated for each fold. If $n$ is a multiple of $k$, we have $n_k=n/k$ and the formula for $MSE_k$ is
 
 $$
 MSE_k=\frac{1}{n_k}\sum_{i \in C_k}(y_i-\hat y_i)^2,
@@ -99,13 +98,13 @@ where $C_k$ denotes the held-out fold $k$, $\hat y_i$ is the fit obtained when h
 The final CV estimate is the average of all the $k$ MSEs:
 
 $$
-CV_k=\frac{1}{n}\sum_{i=j}^k n_k MSE_k
+CV_k=\sum_{i=1}^k \frac{n_k}{n}MSE_k
 $$
 
-Q7. Why may $k$-fold cross-validation be preferred to leave-one-out cross-validation?
-LOOCV is k-fold CV for $k=n$, so LOOCV is usually computationally more expensive than $k$-fold when $k$ is substantially smaller than $n$. This is because for the LOOCV $n$ different models is fitted, as opposed to $k=5$ or $k=10$ that is most common $k$-fold CV in practice. 
+Q7. Why $k$-fold cross-validation may be preferred to leave-one-out cross-validation:
+LOOCV is k-fold CV when $k=n$. When $k$ is substantially smaller than $n$, it follows that LOOCV usually is computationally more expensive than $k$-fold. This is because for the LOOCV $n$ different models is fitted, as opposed to only $k$ models in $k$-fold. In practice $k=5$ or $k=10$ is most common, as these values has turned out to give the best compromise between bias and variance, as we will discuss next.
 
-Another reason for preferring $k$-fold CV over LOOCV comes from the bias-variance trade-off. LOOCV will have a low bias, but a rather high variance comapred to $k$-fold CV. This follows from the procedure of cross validation. One averages over model fits that consists of almost the same set of observations; only one observation differ for each model. This will cause high correlation between each model. When performing LOOCV, one is in general averaging over the models, and the higher correlated these are, the higher will the variance be. From this rationale, the models in $k$-fold cross-validation will be trained on less overlapping training data and will have less variance than the LOOCV.
+Another reason for preferring $k$-fold CV over LOOCV comes from the bias-variance trade-off. LOOCV will have a low bias, but a rather high variance comapred to $k$-fold CV. This follows from the procedure of cross validation. One averages over model fits that consists of almost the same set of observations; only one observation differ for each model. This will cause high correlation between each model. When averaging over values, the higher correlated these are, the higher will the variance be. From this rationale, one can conclude that the models in $k$-fold cross-validation will be trained on less overlapping training data and will have less variance than the LOOCV.
 
 ##1d)
 
@@ -143,19 +142,18 @@ num_cov=which.min(mean.cv.errors)
 par(mfrow=c(1,1))
 plot(mean.cv.errors,type="b")
 ```
-Q9. The optimal model complexity is with 7 covariates, just as in 1b). We see this both from the plot and the list of averaged cross-validation errors. 
+Q9. The optimal model complexity is with 7 covariates, just as in 1b), as we see from the list of averaged cross-validation errors with lowest value 10.562.
 
 Q10. Since we get the same model complexity from 10-fold cross-validation as with the best subset method, we get the same coefficients for the $\hat\beta$'s.
 The new values for `ourAutoTest` are the same as in Q4 and Q5, as well as the MSE for the test set.
 
-
 ##2a) Explain figures
 
-* Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
+Q11: The first figure corresponds to Lasso, and the second figure corresponds to Ridge regression. 
 
 This can be concluded from the fact that the coefficient values in the first figure becomes zero for large enough value of $\lambda$, which is only possible for Lasso and not for Ridge regression. In Ridge regression the coefficient values only approaches zero as $\lambda$ grows, which is corresponding to figure 2.  
 
-* Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the coefficient absolute values. This reduction increases with the value of $\lambda$.
+Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the coefficient absolute values. This reduction increases with the value of $\lambda$.
 
 This can be seen from the formulas, as they include the terms $\lambda \sum_{j=1}^p \beta_j^2$ and $\lambda \sum_{j=1}^p |\beta_j|$ respectively in ridge regression and lasso. These terms favours $\beta$-values close to zero, as the $\beta$-values should be chosen to minimize the expressions for the two models. 
 
@@ -165,13 +163,11 @@ Increasing lambda will result in less flexibility of the model. As a consequence
 
 When $\lambda \rightarrow \infty$ the $\beta$-values will approach zero in Ridge regression and become zero in Lasso in order to minimize the model expressions. When $\lambda = 0$ both Ridge regression and Lasso will produce the same output as ordinary least squares estimate, as the penalty term is removed.
 
-* Q13:
+Q13:
 
 For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. On the other hand in Ridge regression the coefficients will not become zero, and thus it does not perform model selection.
 
 In problem 1b BIC is used to compare models with different number of included variables. Weight, year and cylinders are the variables that are included in most of the models in 1b. The best model according to the method in 1b is that where only the acceleration variable is excluded. In figure 1 both year and cylinders need a higher $\lambda$-value to become zero than most of the other variables. Weight has a very low coefficient value, and thus it it difficult to see when it becomes zero. However, it seems like the same trends of reletive importancy of the variables are captured in both methods. On the other hand, for a $\lambda$-value above 2, Lasso has set almost all of the variables to zero. Thus for a high $\lambda$-value, the two methods gives quite different results. The x-axis in figure 1 and 2 are not scales equally. In figure 2 a much higher $\lambda$-value is needed to have the coefficients approximately zero. Here is seems like year is goin more towards zero than cylinders and origin 3. This could be due to that year initially has a lower value. 
-
-
 
 
 ```{r,echo=FALSE,results="hide"}
@@ -191,14 +187,13 @@ plot(cv.out)
 
 ##2b) Finding the optimal $\lambda$
 
-* Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
+Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
 
-* Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is the highest $\lambda$-values such that the MSE "is whithin one standard error of the minimum".
+Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is the highest $\lambda$-values such that the MSE "is whithin one standard error of the minimum".
 
-* Q16: 
+Q16: 
 
 ```{r, echo=TRUE, eval=TRUE}
-
 library(glmnet)
 set.seed(4268)
 
@@ -223,11 +218,11 @@ cv.out$lambda.1se
 
 ```
 
-We chose the last one to be the optimal $\lambda$, and use this for the next exercise.
+We chose the last one to be the optimal $\lambda$, and we will use this for the next exercise.
 
 ##2c) Prediction
 
-* Q17: 
+Q17: 
 Fitting a model with lasso using $\lambda = 0.01$ gives the following coefficients
 
 ```{r,echo=TRUE, eval=TRUE}
@@ -242,6 +237,11 @@ newx=matrix(c(0,150,100,3000,10,82,0,0),nrow=1)
 # then do the prediction
 ```
 
+<<<<<<< HEAD
+=======
+Q18: Predicted value:
+
+>>>>>>> 71c5937dcc4fdc2432d55bbe2bbeb7343deb6a5e
 Thus the model is
 
 $$Y = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}-0.0061x_{weight}+0.12x_{acceleration} +0.78x_{year}+1.68x_{origin2}+2.83x_{origin3}$$
@@ -269,11 +269,6 @@ library(GGally)
 library(leaps)
 library(glmnet)
 library(ggplot2)
-library(plyr)
-#ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1", "2","3"),
- #                             to = c('Am','Eu','Jap'))
-ourAutoTrain$origin=mapvalues(ourAutoTrain$origin, from = c("1","2","3"),
-                              to = c("Am","Eu","Jap"))
 gamobject <- gam(mpg~bs(displace, knots = 290)+poly(horsepower,2)+
                    weight+s(acceleration, 3)+origin,data=ourAutoTrain)
 
@@ -281,17 +276,17 @@ par(mfrow=c(2,3))
 plot(gamobject,se=TRUE,col="blue")
 
 ```
-The resulting plots shows the fitted GAM with five components, in addition to the pointwise standard errors for each feature. In general, GAM-plots shows how the response, in our case the `mgp`, will vary when holding all but one of the variables constant. This is done for all five variables.
+The resulting plots shows the fitted GAM with five components, in addition to the pointwise standard errors for each feature. In general, GAM-plots shows how the response, in our case the `mpg`, will vary when holding all but one of the variables constant. This is done for all five variables.
 
-Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response is smaller until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that the error curves in both ends are quite large. A reason for this is fewer data points in these areas.
+Upper left: A cubic spline in `displace` with one knot at 290. The plot shows that when increasing `displace` from 0 to 400, there is on average a decrease of `mpg`. Furthermore, the curve indicates that the response decreases faster for `displace`-values between 0 and 290. At the knot at 290, there seems to be a local minimum and the change in the response will slightly increase until 400, where further increasing engine displacement will lead to a more rapid decreasement of miles per gallon. Note that there are fewer observations from about 300 on the `displace`-axis, so error curves in this area is quite large. 
 
-Top, in the middle: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
+Top row, middle plot: A polynomial of degree 2 of `mpg` as a function of `horsepower`. The plot shows that an increase in horsepower will on average deacrease the use of miles per gallon. As in the previous plot, we also observe larger errors in the boundaries which can be explained by fewer observations in the ends of the curve. (almost no data points >200).
 
 Upper right: Linear regression fit using `weight` as predictor. The fitted curve indicates that an increase in weight will on average lead to a decrease in `mpg`.
 
 lower left: A smoothing spline with 3 degrees of freedom. Most of the data points lies in the area between 13 and 20. Here, the curve indicates that for increased acceleration of the car, the `mpg` will decrease. Few observations in the endpoints lead to large error curves here. 
 
-Lower right: Step function. We have observed more american vehicles, and hence the variance is much smaller for the american cars. On average the European cars have less `mpg` than American that in turn use slighty less than the Japanese cars.
+Lower right: Step function. We have observed more american vehicles, and the variance is much smaller for the these cars. On average the European cars have less `mpg` than Americans, that in turn use slighty less than the Japanese cars, according to our data.
 
 Q20: We have an order $M=4$ spline with $K=1$ knot. In general we will have $M+K-1=4$ basis functions. In our case, the basis the cubic spline is $X,X^2,X^3,(x-c_1)_+^3$. The truncated power function is
 
