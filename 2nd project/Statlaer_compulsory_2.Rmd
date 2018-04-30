@@ -67,7 +67,7 @@ $$
 $$
 
 
-Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest computed BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: ´intercept´, ´cylinders´, ´displace´, ´horsepower´, ´weight´, ´year´, ´origin2´ and ´origin3´. 
+Q4: To choose between the different models $\mathcal{M}_0$ to $\mathcal{M}_d$, we choose the one with smallest computed BIC-value. Here the BIC-value corresponding to the best model is $-520$. Looking at the black fields, we should choose the model with these seven covariates: `intercept`, `cylinders`, `displace`, `horsepower`, `weight`, `year`, `origin2` and `origin3`. 
 
 ```{r, eval=TRUE,echo=TRUE}
 library(ggplot2)
