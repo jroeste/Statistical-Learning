@@ -1,0 +1,40 @@
+---
+title: "Statlaer_comp_ex_3_task_3"
+author: "Julie"
+date: "30 april 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+
+
+
+# Problem 3 - Unsupervised methods
+
+## a) Principal component analysis 
+
+* Q16. Explain what you see in the `biplot` in relation to the loadings for the first two principal components. 
+* Q17. Does this analysis give you any insight into the consumption of beverages and similarities between countries? 
+
+```{r,echo=FALSE,eval=FALSE}
+# reading data on consumption of different beverages for countries
+drink <- read.csv("https://www.math.ntnu.no/emner/TMA4267/2017v/drikke.TXT",sep=",",header=TRUE)
+drink <- na.omit(drink)
+# looking at correlation between consumptions
+drinkcorr=cor(drink)
+library(corrplot)
+corrplot(drinkcorr,method="circle")
+# now for PCA
+pcaS <- prcomp(drink,scale=TRUE) # scale: variables are scaled 
+pcaS$rotation
+summary(pcaS)
+biplot(pcaS,scale=0,cex=0.6) # scale=0: arrows scaled to represent the loadings
+```
+
+## b) Hierarchical clustering 
+
+* Q18. Describe how the distance between _clusters_ are defined for single, complete and average linkage. 
+* Q19. Identify which of the three dendrograms (A, B, C) correspond to the three methods single, complete and average linkage. Justify your solution.
