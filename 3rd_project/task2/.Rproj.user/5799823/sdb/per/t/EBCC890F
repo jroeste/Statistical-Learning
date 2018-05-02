@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\nsubtitle: \"TMA4268 Statistical Learning V2018\"\ntitle: \"Compulsory exercise 3: Group XYZ\"\nauthor: \"NN1, NN2 and NN3\"\ndate: \"`r format(Sys.time(), '%d %B, %Y')`\"\noutput: \n  # html_document\n  pdf_document\n---\n  \n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE,results=\"hold\",message = FALSE,warning=FALSE)\n```\n\n\n# Problem 2 - Nonlinear class boundaries and support vector machine\n\n## a) Bayes decision boundary \n\n* Q11. What is a Bayes classifier, Bayes decision boundary and Bayes error rate?\n\nThe Bayes classifier is a classifier that is based on the conditional probability \n\n$$\nPr(Y=j|X=x_{0}).\n$$\nThe classifier assigns observation $x_0$ to the class $j$ with the largest such probability. For instance, in a two-class situation, the classifier will assign the observation $x_0$ to the class with $$Pr(Y=j|X=x_0)>0.5$$.\n\nBayes decision boundary is the class boundaries where the Bayes classifier's prediction is determined. Continuing with the two-class problem, the Bayes decision boundary will be the set of points in $$\\mathbb{R}^2$$ where the conditional probability is exactly 50% for each class.\n\n\n\n\n\n\n\n",
+    "created" : 1525106111694.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2748523172",
+    "id" : "EBCC890F",
+    "lastKnownWriteTime" : 1525106283,
+    "last_content_update" : -2147483648,
+    "path" : "C:/Users/idafa/Dropbox/NTNU/6. semester/Statistisk læring/Comp3/task2/tredf.Rmd",
+    "project_path" : "tredf.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
