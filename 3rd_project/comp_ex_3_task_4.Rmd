@@ -1,0 +1,25 @@
+---
+title: "comp_ex_3_task4.Rmd"
+author: "Julie"
+date: "May 2, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 4 - Neural networks
+
+```{r}
+model <- keras_model_sequential() %>%
+  layer_dense(units = 16, activation = "relu", input_shape = c(10000)) %>%
+  layer_dense(units = 16, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+```
+
+
+* Q20. What is the advantage of using a non-linear activation function such as `relu`?
+* Q21. Why do we need to use a different activation function (`sigmoid`) in the output layer instead of using `relu` again? 
+* Q22. Plot the training and validation loss and accuracy for the simpler and more complex model mentioned above. How do they compare with the model with 16 hidden units?
+* Q23. Besides reducing the network's size, what other methods can be used to avoid overfitting with neural network models? Briefly describe the intuition behind each one.
