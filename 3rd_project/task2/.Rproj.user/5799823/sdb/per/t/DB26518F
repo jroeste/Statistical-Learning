@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\nsubtitle: \"TMA4268 Statistical Learning V2018\"\ntitle: \"Compulsory exercise 3: Group XYZ\"\nauthor: \"NN1, NN2 and NN3\"\ndate: \"`r format(Sys.time(), '%d %B, %Y')`\"\noutput: \n  # html_document\n  pdf_document\n---\n  \n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE,results=\"hold\",message = FALSE,warning=FALSE)\n```\n\n\n# Problem 2 - Nonlinear class boundaries and support vector machine\n\n## a) Bayes decision boundary \n\n* Q11. What is a Bayes classifier, Bayes decision boundary and Bayes error rate?\n\nThe Bayes classifier is a classifier that is based on the conditional probability \n\n$$\nPr(Y=j|X=x_{0}).\n$$\nThe classifier assigns observation $x_0$ to the class $j$ with the largest such probability. For instance, in a two-class situation, the classifier will assign the observation $x_0$ to the class with $Pr(Y=j|X=x_0)>0.5$.\n\nBayes decision boundary is the class boundaries where the Bayes classifier's prediction is determined. Continuing with the two-class problem, the Bayes decision boundary will be the set of points in $\\mathbb{R}^2$ where the conditional probability is exactly $50\\%$ for each class.\n\nThe Bayes error rate is the test error rate $$\\text{Ave}(I(y_0 \\neq \\hat{y}_0))$$ one obtains when using Bayes classifier on a test set. In the formula, one averages over the test observations. It can be shown that the Bayes classifier is the classifier that minimizes the test error rate, but it requires knowledge about the conditional probability distribution of $Y$ given the observations, which one does not have for real datasets. It is common to compare the Bayes error rate with the classification answer to the irreducible error from the regression setting.\n\n* Q12. When the Bayes decision boundary is known, do we then need a test set?\nWhen the Bayes decision boundary is known, one has in practice the best possible classifier. Effectively, all other classifiers are approximations of the Bayes classifier. As mentioned earlier, the Bayes error rate measures the inherent variance of the data and could be nice to know...? Usually, the purpose of a test set is to assess the performance of the final model, but we know we have the best possile model. Also, the fact that Bayes boundary is known implies that one also know the conditional distribution of the response given the observations in the training set.\n\n## b) Support vector machine\n\n* Q13. What is the difference between a support vector classifier and a support vector machine?\n* Q14. What are parameters for the support vector classifier and the support vector machine? How are these chosen above?\n* Q15. How would you evaluate the support vector machine decision boundary compared to the Bayes decision boundary?\n\n\n\n\n",
+    "created" : 1525103381203.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4266947001",
+    "id" : "DB26518F",
+    "lastKnownWriteTime" : 1525107593,
+    "last_content_update" : -2147483648,
+    "path" : "C:/Users/idafa/Dropbox/NTNU/6. semester/Statistisk læring/Comp3/task2/task2ab.Rmd",
+    "project_path" : "task2ab.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

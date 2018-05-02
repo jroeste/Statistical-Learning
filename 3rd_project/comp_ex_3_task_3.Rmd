@@ -1,0 +1,66 @@
+---
+title: "Statlaer_comp_ex_3_task_3"
+author: "Julie"
+date: "30 april 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+
+
+# Problem 3 - Unsupervised methods
+
+## a) Principal component analysis 
+
+* Q16. Explain what you see in the `biplot` in relation to the loadings for the first two principal components.
+We see that in the first principal component, that tea and wine are negatively correlated, as they point in opposite directions.
+
+* Q17. Does this analysis give you any insight into the consumption of beverages and similarities between countries?
+From the correlation plot, we see what beverages are correlated. First of all, the most noticeable effect is the negative correlation between consumption of coffee and tea. There is also a negative correlation between consumption of tea and wine as well. In general, the correlation factors are quite low, with a highest factor in absolute value of correlation of 0.4. 
+
+Between countries, we see that Great Britain and Ireland, which are closely located, drink tea. Countries like Italy, France and Portugal have negative scores on the first component, which indicates little tea drinking, but a lot of wine drinking. 
+```{r,echo=FALSE,eval=FALSE}
+# reading data on consumption of different beverages for countries
+drink <- read.csv("https://www.math.ntnu.no/emner/TMA4267/2017v/drikke.TXT",sep=",",header=TRUE)
+drink <- na.omit(drink)
+# looking at correlation between consumptions
+drinkcorr=cor(drink)
+library(corrplot)
+corrplot(drinkcorr,method="circle")
+# now for PCA
+pcaS <- prcomp(drink,scale=TRUE) # scale: variables are scaled 
+pcaS$rotation
+summary(pcaS)
+biplot(pcaS,scale=0,cex=0.6) # scale=0: arrows scaled to represent the loadings
+```
+
+## b) Hierarchical clustering 
+
+```{r,echo=FALSE,eval=FALSE}
+library(knitr)
+species=c("Human","Chimpanzee","Gorilla","Orangutan","Gibbon")
+distJC <- matrix(c(0,1,3,9,12,
+                   1,0,2,8,11,
+                   3,2,0,6,11,
+                   9,8,6,0,11,
+                   12,11,11,11,0),5,5)
+dimnames(distJC) <- list(species,species)
+kable(distJC)
+d=as.dist(distJC)
+plot(hclust(d,method="complete"))
+plot(hclust(d,method="average"))
+plot(hclust(d,method="single"))
+```
+
+
+* Q18. Describe how the distance between _clusters_ are defined for single, complete and average linkage. 
+Single: minimal intercluster dissimilarity. The smallest dissimilarity between cluster A and B are computed. 
+Complete: Maximal intercluster dissimilarity. The largest dissim. is recorded.
+Average: The average is recorded.
+* Q19. Identify which of the three dendrograms (A, B, C) correspond to the three methods single, complete and average linkage. Justify your solution.
+Complete corresponds to A because the largest dissimilarity is recorded.
+Average corresponds to B, because it's in the middle
+Single correponds to C, because the smallest dissimilarity is recorded.
