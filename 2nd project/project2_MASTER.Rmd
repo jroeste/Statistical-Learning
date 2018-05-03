@@ -3,9 +3,9 @@ title: 'Compulsory exercise 2: Group 19'
 author: "Ida Marie Falnes, Astrid Langsrud and Julie Røste"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 subtitle: TMA4268 Statistical Learning V2018
 editor_options:
   chunk_output_type: console
@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
 Q1: There are in total $2^d$ different linear regression models that can be fitted when we have d predictors. This is due to the two choices we have for each covariate, either we can have it in our model or not. 
 Another way to come up with the same result is to look at the different models for each complexity. First we have to fit all the d models that contain 1 predictor, then all $\binom{d}{2}=d(d-1)/2$ models that contain 2 predictors, all $\binom{d}{3}=d(d-1)(d-2)/3!$ that contain 3 predictors and so on up to $\binom{d}{d}=1$. Summing up all these combinations in addition to the "null model", the model where have no predictors, we get 
 $$\sum_{k=0}^{d} \binom{d}{k} = ... = 2^d.$$
+
 Here we used the binomial theorem $\sum_{k=0}^{d}\binom{d}{k}x^k=(1+x)^d$ with $x=1$. 
 
 Q2: To choose the best model out of all possibilities we both need to consider the residual sum of squares (RSS) between models with equal amount of predictors and the BIC-criterion to choose among the best models for every number of predictors. This is presented in the following algorithm:
@@ -155,7 +156,8 @@ This can be concluded from the fact that the coefficient values in figure 1 beco
 
 Q12: The tuning parameter penalizes values of the estimated coefficients $\beta$, resulting in a reduction of the sum of the absolute values of the coefficients. When the value of $\lambda$ grows, this reduction also grows. 
 
-This can be seen from the minimization formulas for Ridge regression and Lasso, as they include the terms $\lambda \sum_{j=1}^p \beta_j^2$ and $\lambda \sum_{j=1}^p |\beta_j|$ respectively. These terms favors $\beta$-values close to zero for minimization, and their fraction of the expressions depend on the value of $\lambda$. 
+This can be seen from the minimization formulas for Ridge regression and Lasso, as they include the terms $\lambda \sum_{j=1}^p \beta_j^2$ and $\lambda \sum_{j=1}^p |\beta_j|$ respectively. These terms favours $\beta$-values close to zero for minimization, and their fraction of the expressions depend on the value of $\lambda$. 
+
 
 This can also be seen from the figures as these displays how the coefficient values vary with $\lambda$. The standardized coefficients tends towards zero as $\lambda$ increases. 
 
@@ -167,9 +169,10 @@ Q13:
 
 For Lasso the coefficients eventually become zero when $\lambda$ is large enough, and thus the method results in model selection. On the other hand in Ridge regression the coefficients will not become zero, and thus it does not perform model selection.
 
-In problem 1b, BIC is used to compare models with different number of included variables. For each number of included variables the best model is found, and these are compared. From the figure in exercise 1b it is seen that weight, year and cylinders are the variables that are included in most of the models, indicating that these are important for the model. In figure 1 both year and cylinders need a relatively high $\lambda$-value to become zero. Weight has a very low coefficient value, and thus it is difficult to see when it becomes zero. In figure 2 it also seems like cylinder needs a relatively large $\lambda$-value to become zero. Here it is difficult to say much about year since this has a lower coefficient value initially. However, it seems like the some of the same trends of relative importance of the variables are captured in by the different methods.
+In problem 1b BIC is used to compare models with different number of included variables. For each number of included variables the best model is found, and these are compared. From the figure in exerise 1b it is seen that weight, year and cylinders are the variables that are included in most of the models, indicating that these are important for the model. In figure 1 both year and cylinders need a relatively high $\lambda$-value to become zero. Weight has a very low coefficient value, and thus it is difficult to see when it becomes zero. In figure 2 it also seems like cylinder needs a reletively large $\lambda$-value to become zero. Here it is difficult to say much aboutt year since this has a lower coefficient value initially. However, it seems like the some of the same trends of relative importancy of the variables are captured in by the different methods.
 
-The best model according to the method in 1b is that where only the acceleration variable is excluded.  On the other hand, for a high enough $\lambda$-value many variables are excluded in Lasso, and many variables approach zero in Ridge regression. This indicate that low $\lambda$-values gives models from Lasso and Ridge that is most similar to the best model found using BIC. 
+The best model according to the method in 1b is that where only the acceleration variable is excluded.  On the other hand, for a high enough $\lambda$-value many variables are excluded in Lasso, and many variables approach zero in Ridge regression.This inticates that low $\lambda$-values gives models from Lasso and Ridge that is most similar to the best model found using BIC. 
+
 
 
 ```{r,echo=FALSE,results="hide"}
@@ -191,7 +194,9 @@ plot(cv.out)
 
 Q14: According to the description of the R-package glmnet, it "fits a generalized linear model via penalized maximum likelihood". cv.glmnet does k-fold cross-validation of the glmnet to produce the MSE for different $\lambda$-values.
 
-Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is 1se which correspond to the highest $\lambda$-value such that the MSE not more than one standard error away from the minimum.
+
+Q15: The plot shows how the MSE vary with the value of lambda. We want the MSE to be as small as possible, but we also want regularization to get a simpler model. Thus, two optimal $\lambda$-values are suggested by the plot, shown by a dotted line. The leftmost is that with lowest MSE value, and the other is 1se whichcorrespond to the highest $\lambda$-value such that the MSE not more than one standard error away from the minimum.
+
 
 Q16: 
 
@@ -235,6 +240,7 @@ coef(lasso)
 
 Thus the model is
 
+
 $$
 \hat{Y} = -21.5 -3.38x_{cylinders} + 0.031x_{displace} - 0.035x_{horsepower}
 $$ 
@@ -242,6 +248,7 @@ $$
 $$
 -0.0061x_{weight}+0.12x_{acceleration} +0.78x_{year}+1.68x_{origin2}+2.83x_{origin3}
 $$
+
 
 Q18:
 
@@ -253,6 +260,7 @@ P = predict(lasso, newx=matrix(c(0,150,100,3000,10,82,1,0),nrow=1), s=L)
 P
 
 ```
+
 ##3a)
 
 Q19: Fitting the specified `gam`: 

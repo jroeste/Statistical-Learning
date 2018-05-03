@@ -1,0 +1,172 @@
+---
+title: 'Compulsory exercise 3: Group XYZ'
+author: "NN1, NN2 and NN3"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: TMA4268 Statistical Learning V2018
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+```{r,echo=FALSE,eval=FALSE}
+library(caret) 
+#read data, divide into train and test
+germancredit = read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data")
+colnames(germancredit) = c("checkaccount", "duration", "credithistory", "purpose", "amount", "saving", "presentjob", "installmentrate", "sexstatus", "otherdebtor", "resident", "property", "age", "otherinstall", "housing", "ncredits", "job", "npeople", "telephone", "foreign", "response")
+germancredit$response = as.factor(germancredit$response) #2=bad
+table(germancredit$response)
+str(germancredit) # to see factors and integers, numerics
+
+set.seed(4268) #keep this -easier to grade work
+in.train <- createDataPartition(germancredit$response, p=0.75, list=FALSE)
+# 75% for training, one split
+germancredit.train <- germancredit[in.train,]; dim(germancredit.train)
+germancredit.test <- germancredit[-in.train,];dim(germancredit.test)
+```
+
+## 1a) Full classification tree
+
+A classification tree is a structure of regions in the predictor space, where each region is assigned to a class. The class for a region is determined to be the most occuring class among the trainig observations belonging to the region. A new observation is classified by the region that it falls into.
+
+The construction takes the form of a binary decision tree. This structure provides a simple way to determine which region an observation belongs to. The tree consists of nodes, each with a decision rule on the form:
+
+$$\text{Send to node } a \text{ if }  \{X|X_j <s \} \\ \text{Send to node } b \text{ if } \{X|X_j \geq s\}$$
+
+This corresponds to a split, sending the observation to one of the two preceding nodes. The process starts in the root node, and from here the observation follows a sequence of decision rules until it reaches a leaf node where the observation is assigned to a region.
+
+We want a tree with splits that let us classify as correctly as possible. However, comparing all possible classification trees is very computationally demanding. Thus, we rather use a greedy strategy called recursive binary splitting. This method considers the predictor space and determines which split, predictor and cutpoint, that minimizes the deviance of the two produced regions. Deviance is a measure of impurity, and is calculated as:
+
+$$-2 \sum_m \sum_k n_{mk}log(\hat{p}_{mk}) $$
+where $n_{mk}$ is "the number of observations in the mth terminal node that belong to the kth class" and $\hat{p}_{mk}$ is the "proportion of training observations in the mth region that are from the kth class". 
+
+The recursive binary splitting process starts by picking a split for the root node considering the whole predictor space, and then it repeatedly picks spilts for each of the two regions produced by the previous binary split. It keeps going until it meets some stopping criterion. This could for example be that all regions contain no more than 5 observations. 
+
+The strategy is greedy as it only takes into account what is best at the particular step, and not which split will lead to the best tree in total. When using a greedy method the resulting tree will probably not be the best tree possible, but we still assume that we get a tree that has some success for classification. 
+
+
+```{r,echo=FALSE,eval=FALSE}
+# construct full tree
+library(tree)
+library(pROC)
+fulltree=tree(response~.,germancredit.train,split="deviance")
+summary(fulltree)
+plot(fulltree)
+text(fulltree)
+print(fulltree)
+fullpred=predict(fulltree,germancredit.test,type="class")
+testres=confusionMatrix(data=fullpred,reference=germancredit.test$response)
+print(testres)
+1-sum(diag(testres$table))/(sum(testres$table))
+predfulltree = predict(fulltree,germancredit.test, type = "vector")
+testfullroc=roc(germancredit.test$response == "2", predfulltree[,2])
+auc(testfullroc)
+plot(testfullroc)
+```
+
+
+## b) Pruned classification tree 
+
+* Q2. Why do we want to prune the full tree? 
+
+We want to prue the full tree in order to avoid overfitting or to create a simpler tree.
+
+* Q3. How is amount of pruning decided in the code? 
+
+The amount of pruning is determined by a 5-fold cross-validation from the function cv.tree, which calculates the deviance and size of the resulting subtree from different values of the cost-complexity parameter. Prunesize is then set to the size of subtree that gives the minimal deviance. 
+
+* Q4. Compare the the full and pruned tree classification method with focus on interpretability and the ROC curves (AUC).
+
+The AUC is 0.7446 for the full model and 0.7171 for the pruned version, indicating that the full model is a better classifier. However, the pruned tree is much simpler and easier to interpret than the full tree, as it has only three splits whereas the full tree has 14 splits. So in this case there is a trade-off between interpretability and correctnes of classification. 
+
+```{r, echo=FALSE, eval=FALSE}
+# prune the full tree
+set.seed(4268)
+fullcv=cv.tree(fulltree,FUN=prune.misclass,K=5)
+plot(fullcv$size,fullcv$dev,type="b", xlab="Terminal nodes",ylab="misclassifications")
+print(fullcv)
+prunesize=fullcv$size[which.min(fullcv$dev)]
+prunetree=prune.misclass(fulltree,best=prunesize) 
+plot(prunetree)
+text(prunetree,pretty=1)
+predprunetree = predict(prunetree,germancredit.test, type = "class")
+prunetest=confusionMatrix(data=predprunetree,reference=germancredit.test$response)
+print(prunetest)
+1-sum(diag(prunetest$table))/(sum(prunetest$table))
+predprunetree = predict(prunetree,germancredit.test, type = "vector")
+testpruneroc=roc(germancredit.test$response == "2", predprunetree[,2])
+auc(testpruneroc)
+plot(testpruneroc)
+```
+
+## c) Bagged trees 
+
+* Q5. What is the main motivation behind bagging?
+
+The main motivation behind bagging is to reduce the high variance that often can be a problen for single decision trees. 
+
+* Q6. Explain what the importance plots show, and give your interpretation for the data set.
+
+The importance plots show the relative importance of the predictors by displaying the mean decrease in accuracy and the mean decrease in gini index that each predictor contributes to. The predictors are placed in order from most to least importance. These importance plots shows that the predictors "amount" and "checkaccount" are the most important predictors in this data set, whereas "telephone" and "foreign" are the least important predictors. We could have guessed from the classification trees that checkaccount is a relatively important predictor since it is the top spilt for bith the full and pruned tree.
+
+The two importancec plots does not give the exact same order of importancy of the predictors, but they are similar. From the two plots we can see that some of the predictors have approximately the same importance, meaning it is hard to determine which is most important 
+
+* Q7. Compare the performance of bagging with the best of the full and pruned tree model above with focus on interpretability and the ROC curves (AUC).
+
+AUC = 0.81 for the bagged version, indicating that this is a better classifier than both the full tree and the pruned tree. However the interpretability falls, since we now have many trees instead of one tree.
+
+```{r,echo=FALSE,eval=FALSE}
+library(randomForest)
+set.seed(4268)
+bag=randomForest(response~., data=germancredit,subset=in.train,
+                 mtry=20,ntree=500,importance=TRUE)
+bag$confusion
+1-sum(diag(bag$confusion))/sum(bag$confusion[1:2,1:2])
+yhat.bag=predict(bag,newdata=germancredit.test)
+misclass.bag=confusionMatrix(yhat.bag,germancredit.test$response)
+print(misclass.bag)
+1-sum(diag(misclass.bag$table))/(sum(misclass.bag$table))
+predbag = predict(bag,germancredit.test, type = "prob")
+testbagroc=roc(germancredit.test$response == "2", predbag[,2])
+auc(testbagroc)
+plot(testbagroc)
+varImpPlot(bag,pch=20)
+```
+
+## d) Random forest 
+
+* Q8. The parameter `mtry=4` is used. What does this parameter mean, and what is the motivation behind choosing exactly this value?
+
+This parameter represents the number of random predictors that are evaluated for each split when building a tree. For classification trees this number is often chosen to be the square root of the total number of predictors. In this case there is 20 predictors in the data set, so 4 is near the square root value. 
+
+* Q9. The value of the parameter `mtry` is the only difference between bagging and random forest. What is the effect of choosing `mtry` to be a value less than the number of covariates?
+
+Choosing `mtry`to be a value less than the covariates can reduce the variance. The reason is that if there are present a strong predictor, then this predictor will be chosen for the top spilt for all trees in ordinary bagging. As a result the different trees will be highly correlated, and averaging over correlated trees will not lead to a great reduction in variance. A lower `mtry` value can avoid this problem. 
+
+
+* Q10. Would you prefer to use bagging or random forest to classify the credit risk data?
+
+The random forest increases AUC to 0.83, and is thus a better classifier. 
+
+```{r,echo=FALSE,eval=FALSE}
+set.seed(4268)
+rf=randomForest(response~.,
+                 data=germancredit,subset=in.train,
+                 mtry=4,ntree=500,importance=TRUE)
+rf$confusion
+1-sum(diag(rf$confusion))/sum(rf$confusion[1:2,1:2])
+yhat.rf=predict(rf,newdata=germancredit.test)
+misclass.rf=confusionMatrix(yhat.rf,germancredit.test$response)
+print(misclass.rf)
+1-sum(diag(misclass.rf$table))/(sum(misclass.rf$table))
+predrf = predict(rf,germancredit.test, type = "prob")
+testrfroc=roc(germancredit.test$response == "2", predrf[,2])
+auc(testrfroc)
+plot(testrfroc)
+varImpPlot(rf,pch=20)
+```
+
