@@ -1,0 +1,100 @@
+---
+title: "comp_ex_3_task4.Rmd"
+author: "Julie"
+date: "May 2, 2018"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 4 - Neural networks
+
+```{r}
+library(keras)
+imdb <- dataset_imdb(num_words = 10000)
+
+train_data <- imdb$train$x
+train_labels <- imdb$train$y
+test_data <- imdb$test$x
+test_labels <- imdb$test$y
+
+vectorize_sequences <- function(sequences, dimension = 10000) {
+  results <- matrix(0, nrow = length(sequences), ncol = dimension)
+  for (i in 1:length(sequences))
+    results[i, sequences[[i]]] <- 1                                     
+  results
+}
+
+x_train <- vectorize_sequences(train_data)
+x_test <- vectorize_sequences(test_data)
+y_train <- as.numeric(train_labels)
+y_test <- as.numeric(test_labels)
+
+
+```
+
+
+Use 4 units instead of 16: 
+```{r}
+model <- keras_model_sequential() %>%
+  layer_dense(units = 32, activation = "relu", input_shape = c(10000)) %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+```{r}
+val_indices <- 1:10000
+
+x_val <- x_train[val_indices,]
+partial_x_train <- x_train[-val_indices,]
+y_val <- y_train[val_indices]
+partial_y_train <- y_train[-val_indices]
+
+```
+
+```{r}
+history <- model %>% fit(
+  partial_x_train,
+  partial_y_train,
+  epochs = 5,
+  batch_size = 512,
+  validation_data = list(x_val, y_val)
+)
+```
+
+
+```{r}
+plot(history)
+history_df <- as.data.frame(history)
+min(history_df$value)
+```
+
+
+* Q20. What is the advantage of using a non-linear activation function such as `relu`?
+
+The advantage is that we get a richer hypothesis space, because if not, the network would only learn linear transformations of the input data, and not take advantage of the possibility of having many layers.
+
+* Q21. Why do we need to use a different activation function (`sigmoid`) in the output layer instead of using `relu` again? 
+
+We want the output to be represented as a probability distribution, and then all nodes in the output layer have to take a value between 0 and 1. `relu`can be greater than 1, while `sigmoid` only returns values between 0 and 1. 
+
+* Q22. Plot the training and validation loss and accuracy for the simpler and more complex model mentioned above. How do they compare with the model with 16 hidden units?
+
+
+
+
+* Q23. Besides reducing the network's size, what other methods can be used to avoid overfitting with neural network models? Briefly describe the intuition behind each one.
+
+- Get more data: It is important to have more data than the number of effective parameters. Therefor, getting more data will help reducing overfitting.
+- Add weight reqularization: Since we optimize our loss function, we want to penalize high weight functions. WHY?
+- Add dropout: Adding dropout means adding noise to the model, so the network not will memorize patterns that are not significant. 
