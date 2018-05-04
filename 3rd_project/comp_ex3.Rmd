@@ -1,0 +1,410 @@
+---
+subtitle: "TMA4268 Statistical Learning V2018"
+title: "Compulsory exercise 3: Group XYZ"
+author: "NN1, NN2 and NN3"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  # html_document
+  pdf_document
+---
+
+---
+title: 'Compulsory exercise 3: Group XYZ'
+author: "NN1, NN2 and NN3"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: TMA4268 Statistical Learning V2018
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="hold",message = FALSE,warning=FALSE)
+```
+
+```{r,echo=FALSE,eval=FALSE}
+library(caret) 
+#read data, divide into train and test
+germancredit = read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data")
+colnames(germancredit) = c("checkaccount", "duration", "credithistory", "purpose", "amount", "saving", "presentjob", "installmentrate", "sexstatus", "otherdebtor", "resident", "property", "age", "otherinstall", "housing", "ncredits", "job", "npeople", "telephone", "foreign", "response")
+germancredit$response = as.factor(germancredit$response) #2=bad
+table(germancredit$response)
+str(germancredit) # to see factors and integers, numerics
+
+set.seed(4268) #keep this -easier to grade work
+in.train <- createDataPartition(germancredit$response, p=0.75, list=FALSE)
+# 75% for training, one split
+germancredit.train <- germancredit[in.train,]; dim(germancredit.train)
+germancredit.test <- germancredit[-in.train,];dim(germancredit.test)
+```
+
+## 1a) Full classification tree
+
+A classification tree is a structure of regions in the predictor space, where each region is assigned to a class. The class for a region is determined to be the most occuring class among the trainig observations belonging to the region. A new observation is classified by the region that it falls into.
+
+The construction takes the form of a binary decision tree. This structure provides a simple way to determine which region an observation belongs to. The tree consists of nodes, each with a decision rule on the form:
+
+$$\text{Send to node } a \text{ if }  \{X|X_j <s \} \\ \text{Send to node } b \text{ if } \{X|X_j \geq s\}$$
+
+This corresponds to a split, sending the observation to one of the two preceding nodes. The process starts in the root node, and from here the observation follows a sequence of decision rules until it reaches a leaf node where the observation is assigned to a region.
+
+We want a tree with splits that let us classify as correctly as possible. However, comparing all possible classification trees is very computationally demanding. Thus, we rather use a greedy strategy called recursive binary splitting. This method considers the predictor space and determines which split, predictor and cutpoint, that minimizes the deviance of the two produced regions. Deviance is a measure of impurity, and is calculated as:
+
+$$-2 \sum_m \sum_k n_{mk}log(\hat{p}_{mk}) $$
+where $n_{mk}$ is "the number of observations in the mth terminal node that belong to the kth class" and $\hat{p}_{mk}$ is the "proportion of training observations in the mth region that are from the kth class". 
+
+The recursive binary splitting process starts by picking a split for the root node considering the whole predictor space, and then it repeatedly picks spilts for each of the two regions produced by the previous binary split. It keeps going until it meets some stopping criterion. This could for example be that all regions contain no more than 5 observations. 
+
+The strategy is greedy as it only takes into account what is best at the particular step, and not which split will lead to the best tree in total. When using a greedy method the resulting tree will probably not be the best tree possible, but we still assume that we get a tree that has some success for classification. 
+
+
+```{r,echo=FALSE,eval=FALSE}
+# construct full tree
+library(tree)
+library(pROC)
+fulltree=tree(response~.,germancredit.train,split="deviance")
+summary(fulltree)
+plot(fulltree)
+text(fulltree)
+print(fulltree)
+fullpred=predict(fulltree,germancredit.test,type="class")
+testres=confusionMatrix(data=fullpred,reference=germancredit.test$response)
+print(testres)
+1-sum(diag(testres$table))/(sum(testres$table))
+predfulltree = predict(fulltree,germancredit.test, type = "vector")
+testfullroc=roc(germancredit.test$response == "2", predfulltree[,2])
+auc(testfullroc)
+plot(testfullroc)
+```
+
+
+## b) Pruned classification tree 
+
+* Q2. Why do we want to prune the full tree? 
+
+We want to prue the full tree in order to avoid overfitting or to create a simpler tree.
+
+* Q3. How is amount of pruning decided in the code? 
+
+The amount of pruning is determined by a 5-fold cross-validation from the function cv.tree, which calculates the deviance and size of the resulting subtree from different values of the cost-complexity parameter. Prunesize is then set to the size of subtree that gives the minimal deviance. 
+
+* Q4. Compare the the full and pruned tree classification method with focus on interpretability and the ROC curves (AUC).
+
+The AUC is 0.7446 for the full model and 0.7171 for the pruned version, indicating that the full model is a better classifier. However, the pruned tree is much simpler and easier to interpret than the full tree, as it has only three splits whereas the full tree has 14 splits. So in this case there is a trade-off between interpretability and correctnes of classification. 
+
+```{r, echo=FALSE, eval=FALSE}
+# prune the full tree
+set.seed(4268)
+fullcv=cv.tree(fulltree,FUN=prune.misclass,K=5)
+plot(fullcv$size,fullcv$dev,type="b", xlab="Terminal nodes",ylab="misclassifications")
+print(fullcv)
+prunesize=fullcv$size[which.min(fullcv$dev)]
+prunetree=prune.misclass(fulltree,best=prunesize) 
+plot(prunetree)
+text(prunetree,pretty=1)
+predprunetree = predict(prunetree,germancredit.test, type = "class")
+prunetest=confusionMatrix(data=predprunetree,reference=germancredit.test$response)
+print(prunetest)
+1-sum(diag(prunetest$table))/(sum(prunetest$table))
+predprunetree = predict(prunetree,germancredit.test, type = "vector")
+testpruneroc=roc(germancredit.test$response == "2", predprunetree[,2])
+auc(testpruneroc)
+plot(testpruneroc)
+```
+
+## c) Bagged trees 
+
+* Q5. What is the main motivation behind bagging?
+
+The main motivation behind bagging is to reduce the high variance that often can be a problen for single decision trees. 
+
+* Q6. Explain what the importance plots show, and give your interpretation for the data set.
+
+The importance plots show the relative importance of the predictors by displaying the mean decrease in accuracy and the mean decrease in gini index that each predictor contributes to. The predictors are placed in order from most to least importance. These importance plots shows that the predictors "amount" and "checkaccount" are the most important predictors in this data set, whereas "telephone" and "foreign" are the least important predictors. We could have guessed from the classification trees that checkaccount is a relatively important predictor since it is the top spilt for bith the full and pruned tree.
+
+The two importancec plots does not give the exact same order of importancy of the predictors, but they are similar. From the two plots we can see that some of the predictors have approximately the same importance, meaning it is hard to determine which is most important 
+
+* Q7. Compare the performance of bagging with the best of the full and pruned tree model above with focus on interpretability and the ROC curves (AUC).
+
+AUC = 0.81 for the bagged version, indicating that this is a better classifier than both the full tree and the pruned tree. However the interpretability falls, since we now have many trees instead of one tree.
+
+```{r,echo=FALSE,eval=FALSE}
+library(randomForest)
+set.seed(4268)
+bag=randomForest(response~., data=germancredit,subset=in.train,
+                 mtry=20,ntree=500,importance=TRUE)
+bag$confusion
+1-sum(diag(bag$confusion))/sum(bag$confusion[1:2,1:2])
+yhat.bag=predict(bag,newdata=germancredit.test)
+misclass.bag=confusionMatrix(yhat.bag,germancredit.test$response)
+print(misclass.bag)
+1-sum(diag(misclass.bag$table))/(sum(misclass.bag$table))
+predbag = predict(bag,germancredit.test, type = "prob")
+testbagroc=roc(germancredit.test$response == "2", predbag[,2])
+auc(testbagroc)
+plot(testbagroc)
+varImpPlot(bag,pch=20)
+```
+
+## d) Random forest 
+
+* Q8. The parameter `mtry=4` is used. What does this parameter mean, and what is the motivation behind choosing exactly this value?
+
+This parameter represents the number of random predictors that are evaluated for each split when building a tree. For classification trees this number is often chosen to be the square root of the total number of predictors. In this case there is 20 predictors in the data set, so 4 is near the square root value. 
+
+* Q9. The value of the parameter `mtry` is the only difference between bagging and random forest. What is the effect of choosing `mtry` to be a value less than the number of covariates?
+
+Choosing `mtry`to be a value less than the covariates can reduce the variance. The reason is that if there are present a strong predictor, then this predictor will be chosen for the top spilt for all trees in ordinary bagging. As a result the different trees will be highly correlated, and averaging over correlated trees will not lead to a great reduction in variance. A lower `mtry` value can avoid this problem. 
+
+
+* Q10. Would you prefer to use bagging or random forest to classify the credit risk data?
+
+The random forest increases AUC to 0.83, and is thus a better classifier. 
+
+```{r,echo=FALSE,eval=FALSE}
+set.seed(4268)
+rf=randomForest(response~.,
+                 data=germancredit,subset=in.train,
+                 mtry=4,ntree=500,importance=TRUE)
+rf$confusion
+1-sum(diag(rf$confusion))/sum(rf$confusion[1:2,1:2])
+yhat.rf=predict(rf,newdata=germancredit.test)
+misclass.rf=confusionMatrix(yhat.rf,germancredit.test$response)
+print(misclass.rf)
+1-sum(diag(misclass.rf$table))/(sum(misclass.rf$table))
+predrf = predict(rf,germancredit.test, type = "prob")
+testrfroc=roc(germancredit.test$response == "2", predrf[,2])
+auc(testrfroc)
+plot(testrfroc)
+varImpPlot(rf,pch=20)
+```
+
+
+# Problem 2 - Nonlinear class boundaries and support vector machine
+
+## a) Bayes decision boundary 
+
+* Q11. What is a Bayes classifier, Bayes decision boundary and Bayes error rate?
+
+The Bayes classifier is a classifier that is based on the conditional probability 
+
+$$
+Pr(Y=j|X=x_{0}),
+$$
+the probability that the response is class $j$, given the predictor value. The classifier assigns observation $x_0$ to the class $j$ with the largest such probability. For instance in a two-class situation, the classifier will assign the observation $x_0$ to the class with $Pr(Y=j|X=x_0)>0.5$.
+
+Bayes decision boundary is the class boundaries where the Bayes classifier's prediction is determined. This boundary represents the points where it is the exact same conditional probability for each class. Continuing with the two-class problem, the Bayes decision boundary will be the set of points in $\mathbb{R}^2$ where the conditional probability defined above is exactly $50\%$ for each class.
+
+The Bayes error rate is the test error rate  one obtains when using Bayes classifier on a test set. The test error rate is defined as $$\text{Ave}(I(y_0 \neq \hat{y}_0))$$. In the formula, one averages over the test observations and get the fraction of misclassified observations. It can be shown that the Bayes classifier is the classifier that minimizes the test error rate, but it requires knowledge about the conditional probability distribution of $Y$ given the observations, which one does not have for real datasets. The Bayes error rate can be written as $1-E(\text{maxPr}(Y=j|X))$, where the expectation is over $X$. It is common to regard the Bayes error rate as the classification answer to the irreducible error from the regression setting.
+
+* Q12. When the Bayes decision boundary is known, do we then need a test set?
+
+When the Bayes decision boundary is known, one has in practice the best possible classifier, so effectively, all other classifiers are approximations of the Bayes classifier. As mentioned above, the Bayes error rate can be compared to the irreducible error, and gives a measure on the inherent variance of the data and origins from factors we have not measured. Usually, the purpose of a test set is to assess the performance of a final model, but in this case we already know we have the best possible model. Also, the fact that Bayes decision boundary is known implies that one knows the conditional distribution of the response given the observations in the training set. It is then possible to calculate the error rate analytically (which was done for an example in the lectures) and there is no need for a test set.
+
+## b) Support vector machine
+
+* Q13. What is the difference between a support vector classifier and a support vector machine?
+
+The support vector classifier is a relatively simple classifier used when a separating hyperplane does not necessarily exist. It has a linear decision boundary. The difference from a support vector machine (SVM) is that the SVM can be viewed as an expansion of the support vector classifier. By enlargening the feature space using kernels, it allows for non-linear boundaries. By defining this kernel as linear, one has in practice the support vector classifier, as it turns out that this corresponds to the inner product between the support vectors and the observations in the training set. 
+
+* Q14. What are parameters for the support vector classifier and the support vector machine? How are these chosen above?
+
+ Mathematically, the support vector classifier is the result of the optimization problem
+
+$$
+\max_{\beta_0,\beta_1,...,\epsilon_1,...,\epsilon_n,M} M \quad s.t.\quad \sum_{i=1}^{p}\beta_i^2=1, \quad y_i(\beta_0+\beta_1x_{i1}+...+\beta_px_{ip})=y_if(\mathbf{x_i})\geq M(1-\epsilon_i), \quad \epsilon_i \geq 0,\quad \sum_{i=1}^{n}\epsilon_i\leq C.
+$$
+Here, M is the width of the margin. The resulting hyperplane depend only on the observations that violate the margin and should have normalized coefficients $\beta_i$'s. The variables $\epsilon_i$ are called slack variables and gives information about where each observation are relative to the separating hyperplane and the margin. If $\epsilon_i=0$, then the observation is on the correct side of the margin, if $\epsilon_i>0$, the observation is on the wrong side of the margin and if $\epsilon>1$, the observation is on wrong side of the hyperplane and is thus misclassified. The parameter $C$ is a tuning parameter. It governs the tolerance of violations to the margin. As $C$ increases, more violations are allowed and the margin will increase as well, and the variance will decrease. $C$ is usually chosen via cross validation. In the `svm()`-function in the above code, the variable $C$ is not used, but instead we define a cost function that can be interpreted in a slightly different way; it allows us to specify the influence each violation to the margin has. When this is small, the margin will be wider than if this cost is large. In the above code, the `tune()`-function performs ten-fold cross-validation on a range of different cost values and it returns the best result in the output, which in turn is used by the `svm()`-function to fit the best model.
+
+By exchanging the above function $f(\mathbf{x_i})$ with a kernel representation $g(\mathbf{x_i})$ where 
+
+$$
+g(\mathbf{x})=\beta_0 + \sum_{i \in \mathcal{S}} \alpha_iK(\mathbf{x},\mathbf{x}_i),
+$$
+we can obtain the expression for SVM by rewriting the optimization problem as 
+
+$$
+\max_{\beta_0,\beta_1,...,\epsilon_1,...,\epsilon_n,M} M \quad s.t.\quad y_ig(\mathbf{x_i})\geq M(1-\epsilon_i), \quad i \in [1,n], \quad \epsilon_i \geq 0,\quad \sum_{i=1}^{n}\epsilon_i\leq C.
+$$
+In the code, the kernel used is the radial kernel, defined as 
+
+$$
+K(x_i,x_i')=\text{exp}\{-\gamma\sum_{j=1}^p (x_{ij}-x_{i'j})^2\},
+$$
+where the constant $\gamma$ is tuning parameter also chosen by the `tune()`-function using ten-fold cross-validation. 
+
+* Q15. How would you evaluate the support vector machine decision boundary compared to the Bayes decision boundary?
+
+The SVM decision boundary seems to follow the same trends as the Bayes decision boundary in areas where there are many observations. In areas where there are fewer observations, the two boundaries seems to differ more, which is natural consequence of fewer data points and less information for the model to rely on in these areas. The SVM boundary seems to be somewhat overfit in areas with fewer data points- if new data were used to test the model, there could be some errors in the areas with less data points. This could be prevented using a smaller cost function to increase the number of support vectors (allowing for more slack), at the cost of potentially a higher bias.
+
+# Problem 3 - Unsupervised methods
+
+## a) Principal component analysis 
+
+* Q16. Explain what you see in the `biplot` in relation to the loadings for the first two principal components.
+
+The loadings for the principal components are the  weights in front of the variables which gives the principal components:
+
+$$
+i^{th} \text{principal component}=Z_i=\sum_{p=1}^n\phi_{pi}X_p
+$$
+For the first principal component, wine and tea are the most significant factors with loadings of respectively -0.5 and 0.66. They point in each direction, which means they are negatively correlated. The other beverages are located closer to the center. As for liquer, it is almost not explained by PC1 at all, with a loading of 0.021.
+With loadings of 0.67 and 0.58, coffee and cocoa are the most significant factors for the second principal component. For wine and tea, almost no information is explained by PC2. 
+Loading vectors pointing in the same direction, provides information about the drinking habits. For example, a low or high consume of cocoa, tells us that there is a low or high consume of beer as well. 
+
+
+* Q17. Does this analysis give you any insight into the consumption of beverages and similarities between countries?
+
+From the correlation plot, we see what beverages are correlated. First of all, the most noticeable effect is the negative correlation between consumption of coffee and tea. There is also a negative correlation between consumption of tea and wine as well. In general, the correlation factors are quite low, with a highest factor in absolute value of correlation of 0.4. 
+
+Between countries, we see that Great Britain and Ireland, which are closely located in the plot, but also geographically, have the same drinking habits and opinions about tea. Countries like Italy, France and Portugal have negative scores on the first component, with opposite meaning of drinking tea. Also, the loading vector for tea is longer than the one for liquer, which means the opinions about tea is stronger for countries as Great Britain and Ireland, than for Hungary and the Soviet Union. 
+
+Since the Netherlands has a large positive score on the second component, we can assume that they have very strong opinions about cocoa.
+
+At last, we can not by looking directly at the biplot say if countries like or dislike a given beverage, since they only are unique up to a sign flip. But using the fact that we know that Italy, Spain and Portugal produce a lot of wine, we can assume that they consume a lot, and that Great Britain and Ireland consume a lot of tea.
+```{r,echo=FALSE,eval=FALSE}
+# reading data on consumption of different beverages for countries
+drink <- read.csv("https://www.math.ntnu.no/emner/TMA4267/2017v/drikke.TXT",sep=",",header=TRUE)
+drink <- na.omit(drink)
+# looking at correlation between consumptions
+drinkcorr=cor(drink)
+library(corrplot)
+corrplot(drinkcorr,method="circle")
+# now for PCA
+pcaS <- prcomp(drink,scale=TRUE) # scale: variables are scaled 
+pcaS$rotation
+summary(pcaS)
+biplot(pcaS,scale=0,cex=0.6) # scale=0: arrows scaled to represent the loadings
+```
+
+## b) Hierarchical clustering 
+
+```{r,echo=FALSE,eval=FALSE}
+library(knitr)
+species=c("Human","Chimpanzee","Gorilla","Orangutan","Gibbon")
+distJC <- matrix(c(0,1,3,9,12,
+                   1,0,2,8,11,
+                   3,2,0,6,11,
+                   9,8,6,0,11,
+                   12,11,11,11,0),5,5)
+dimnames(distJC) <- list(species,species)
+kable(distJC)
+d=as.dist(distJC)
+h_a=hclust(d,method="average")
+h_c=hclust(d,method="complete")
+h_s=hclust(d,method="single")
+plot(h_c)
+plot(h_a)
+plot(h_s)
+
+h_c$height
+h_a$height
+h_s$height
+
+```
+
+
+* Q18. Describe how the distance between _clusters_ are defined for single, complete and average linkage.
+
+Linkage is defined as the dissimilarity between groups of observations. 
+Single: minimal intercluster dissimilarity. The smallest dissimilarity between cluster A and B is  computed. 
+Complete: Maximal intercluster dissimilarity. The largest dissimilarity between A and B  is recorded.
+Average: The average intercluser dissimilarity. The average dissimilarity between A and B is recorded.
+
+* Q19. Identify which of the three dendrograms (A, B, C) correspond to the three methods single, complete and average linkage. Justify your solution.
+
+All the cluster dendograms has height 1 between human and chimpanze.
+Dendrogram A has heights 1, 3, 9 and 12. These are the largest dissimilarities between human and the different animals, as in column 1 in the distance matrix, which means that A corresponds to complete linkage.
+Dendrogram B has heights 1, 2.50, 7.67 and 11.25. Between Gorilla and the cluster (Human/Chimpanzee), the distance is 2.5, which corresponds to $\frac{1}{2}(G-H+G-C)=\frac{5}{2}=2.5$. The same reasoning can be used for the other heights: 
+$\frac{1}{3}(O-H+O-C+O-G)=\frac{23}{3}=7.67$ for two clusters and  $\frac{1}{4}(Gibb-H+Gibb-C+Gibb-G+Gibb-O)=\frac{45}{4}=11.25$. This way of averaging is called weighted pair group method average, and differs from unweighted pair group method average, which only looks at the average between the clusters.
+We can therefore conclude that dendrogram B corresponds to average linkage. 
+The last dendrogram, C, has heights 1,2,6 and 11, which corresponds to single linkage because the shortest distance between clusters is computed. 
+
+# Problem 4 - Neural networks
+
+```{r,echo=FALSE}
+library(keras)
+imdb <- dataset_imdb(num_words = 10000)
+
+train_data <- imdb$train$x
+train_labels <- imdb$train$y
+test_data <- imdb$test$x
+test_labels <- imdb$test$y
+
+vectorize_sequences <- function(sequences, dimension = 10000) {
+  results <- matrix(0, nrow = length(sequences), ncol = dimension)
+  for (i in 1:length(sequences))
+    results[i, sequences[[i]]] <- 1                                     
+  results
+}
+
+x_train <- vectorize_sequences(train_data)
+x_test <- vectorize_sequences(test_data)
+y_train <- as.numeric(train_labels)
+y_test <- as.numeric(test_labels)
+
+
+```
+
+
+Use 4 units instead of 16: 
+```{r,echo=FALSE}
+model <- keras_model_sequential() %>%
+  layer_dense(units = 32, activation = "relu", input_shape = c(10000)) %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+```{r,echo=FALSE}
+val_indices <- 1:10000
+
+x_val <- x_train[val_indices,]
+partial_x_train <- x_train[-val_indices,]
+y_val <- y_train[val_indices]
+partial_y_train <- y_train[-val_indices]
+
+```
+
+```{r,echo=FALSE}
+history <- model %>% fit(
+  partial_x_train,
+  partial_y_train,
+  epochs = 5,
+  batch_size = 512,
+  validation_data = list(x_val, y_val)
+)
+```
+
+
+```{r,echo=FALSE}
+plot(history)
+history_df <- as.data.frame(history)
+min(history_df$value)
+```
+
+
+* Q20. What is the advantage of using a non-linear activation function such as `relu`?
+
+The advantage is that we get a richer hypothesis space, because if not, the network would only learn linear transformations of the input data, and not take advantage of the possibility of having many layers.
+
+* Q21. Why do we need to use a different activation function (`sigmoid`) in the output layer instead of using `relu` again? 
+
+We want the output to be represented as a probability distribution, and then all nodes in the output layer have to take a value between 0 and 1. `relu`can be greater than 1, while `sigmoid` only returns values between 0 and 1. 
+
+* Q22. Plot the training and validation loss and accuracy for the simpler and more complex model mentioned above. How do they compare with the model with 16 hidden units?
+
+
+
+* Q23. Besides reducing the network's size, what other methods can be used to avoid overfitting with neural network models? Briefly describe the intuition behind each one.
+
+- Get more data: It is important to have more data than the number of effective parameters. Therefor, getting more data will help reducing overfitting.
+- Add weight reqularization: Since we optimize our loss function, we want to penalize high weight functions. WHY?
+- Add dropout: Adding dropout means adding noise to the model, so the network not will memorize patterns that are not significant. 
+
