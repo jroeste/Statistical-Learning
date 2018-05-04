@@ -68,7 +68,7 @@ where the constant $\gamma$ is tuning parameter also chosen by the `tune()`-func
 
 * Q15. How would you evaluate the support vector machine decision boundary compared to the Bayes decision boundary?
 
-The SVM decision boundary seems to follow the same trends as the Bayes decision boundary in areas where there are many observations. In areas where there are fewer observations, the two boundaries seems to differ more, which is natural consequence of fewer data points and less information for the model to rely on in these areas. The SVM boundary seems to be somewhat overfit in areas with fewer data points- if new data were used to test the model, there could be some errors in the areas with less data points. This could be prevented using a smaller cost function to increase the number of support vectors (allowing for more slack), at the cost of potentially a higher bias.
+The SVM decision boundary seems to follow the same trends as the Bayes decision boundary in areas where there are many observations. In areas where there are fewer observations, the two boundaries seems to differ more, which is natural consequence of fewer data points and less information for the model to rely on in these areas. The SVM boundary seems to be somewhat overfit in areas with fewer data points- if new data were used to test the model, there could be some errors in the areas with less data points. This is because the same complexity is used to model the whole area, which is a  drawback for the model for in this case.
 
 
 
