@@ -5,3 +5,4 @@
 *.Rdata
 *.RData
 .Rproj.user/
+*.tex
